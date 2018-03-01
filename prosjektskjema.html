@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Prosjektregistrering</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css\prosjektregistrering_style.css">
+  <script src="https://js.arcgis.com/4.6/"></script>
+  <script src="js\kart.js"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="sidepanel"></div>
+    <div class="hovedpanel">
+      <div id="header">
+        <img id="logo" src="img\logo.png">
+        <h2>Turregistrering</h2>
+        <img id="strek" src="img\strek.png">
+      </div>
+      <!-- Fjelltoppseksjon -->
+      <button id="toppdetaljer" class="accordion active">Toppinfo</button>
+      <div id="toppinfo" class="panel aapen">
+        <p>I denne seksjonen skal du enten velge en eksisterende topp eller registrere en ny topp.
+           <br/>Felter merket med * er obligatoriske
+        </p>
+        <!-- Kartet for registrering eller velging av topp -->
+        <div id="toppViewDiv">
+        </div>
+        <form name="toppregistrering">
+          <h3>Toppinformasjon</h3>
+          <div class="formitem">
+            <label for="toppnavn">Navn *</label>
+            <input type="text" name="toppnavn" placeholder="Skriv inn fjellets navn" required>
+          </div>
+
+          <div class="formitem">
+            <label for="">Antall parkeringsplasser *</label>
+            <select name="vegavdeling" required>
+              <option value="" disabled selected>Velg antall parkeringsplasser</option>
+              <option value="Finnmark">Finnmark</option>
+              <option value="Troms">Troms</option>
+              <option value="Midtre-Hålogaland">Midtre-Hålogaland</option>
+              <option value="Nordland">Nordland</option>
+            </select>
+          </div>
+
+          <div class="formitem">
+            <label for="">Vinterbrøytet *</label>
+            <select name="vegavdeling" required>
+              <option value="" disabled selected>Velg alternativ</option>
+              <option value="ja">Ja</option>
+              <option value="nei">Nei</option>
+            </select>
+          </div>
+
+          <div class="formitem">
+            <label for="merknad">Merknad</label>
+            <textarea  name="merknad" placeholder="Skriv inn en merknad om parkeringen om det finnes noen" rows="8" cols="80"></textarea>
+          </div>
+        </form>
+        <div name="valgt-parkering-info" class="">
+          <p>Navn: <span id="toppnavn"></span></p>
+          <p>Høyde: <span id="hoyde"></span></p>
+          <p>Beskrivelse: <span id="beskrivelse"></span></p>
+          <p>Merknad: <span id="merknad"></span></p>
+        </div>
+        <div id="valideringForm" class="message">
+        </div>
+      </div>
+      <!-- Parkerings-seksjon -->
+      <button id="parkeringregistrering" class="accordion">Parkering</button>
+      <div id="parkeringinfo" class="panel aapen">
+        <p>I denne seksjonen skal du enten velge en allerede registrert parkering eller registrere en ny parkering.
+           <br/>Felter merket med * er obligatoriske
+        </p>
+        <!-- Kartet for registrering eller velging av parkering -->
+        <div id="parkeringViewDiv">
+        </div>
+        <form name="parkeringregistrering">
+          <h3>Parkeringformasjon</h3>
+          <div class="formitem">
+            <label for="topphoyde">Høyde *</label>
+            <div id="dato">
+              <input type="number" min="0" max="2700" name="topphoyde" placeholder="moh" required>
+            </div>
+          </div>
+
+          <div class="formitem">
+            <label for="beskrivelse">Beskrivelse *</label>
+            <textarea  name="beskrivelse" placeholder="Skriv inn en beskrivelse av turen" rows="8" cols="80"></textarea>
+          </div>
+
+          <div class="formitem">
+            <label for="merknad">Merknad</label>
+            <textarea  name="merknad" placeholder="Skriv inn en merknad av turen om det finnes noen" rows="8" cols="80"></textarea>
+          </div>
+        </form>
+        <div name="valgt-topp-info" class="">
+          <p>Navn: <span id="toppnavn"></span></p>
+          <p>Høyde: <span id="hoyde"></span></p>
+          <p>Beskrivelse: <span id="beskrivelse"></span></p>
+          <p>Merknad: <span id="merknad"></span></p>
+        </div>
+        <div id="valideringForm" class="message">
+        </div>
+      </div>
+
+      <button id="sendinn" class="accordion">Send inn</button>
+      <div id="submit" class="panel">
+        <div id="sluttmelding" class="errorMessage">
+          <p>Registreringen av prosjekt med navn <span id="prosjektVerdi">Prosjektnavn</span> er fullført</p>
+          <p>For å se en kartoversikt over registrerte prosjekter i region Nord kan du gå inn på <a href="http://vegvesen.maps.arcgis.com/apps/webappviewer/index.html?id=2c6b9e7a5a57410c9d833c7cb0e5c6b2" target="#">dette</a> kartet</p>
+          <p>Om du vil registrere et nytt prosjekt kan du gjøre dette ved å trykke på knappen under</p>
+        </div>
+        <button type="button" name="nyttprosjekt">Registrer nytt prosjekt</button>
+      </div>
+    </div>
+    <div class="sidepanel"></div>
+  </div>
+  <script type="text/javascript" src="js\prosjektregistrering.js"></script>
+</body>
+</html>

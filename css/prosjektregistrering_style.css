@@ -1,0 +1,426 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+body{
+  margin:0;
+  padding:0;
+  font-family: "Raleway",sans-serif;
+  color: #2E3539;
+  min-height: 100vh;
+  background-image: url("../img/bakgrunn_blur4.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+a{
+  color: #ED9300;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all ease-in 0.2s;
+}
+
+a:hover{
+  font-weight: bold;
+  border-bottom: 2px solid #ED9300;
+}
+#header{
+  display: flex;
+  color: white;
+  background-color: #45515A;
+  justify-content:  space-between;
+  align-items: center;
+  border-bottom: 1px #c37900 solid;
+  position: relative;
+  overflow: hidden;
+}
+
+#logo{
+  left: 0;
+  height: 40px
+}
+
+#strek{
+  height: 70px
+}
+
+.wrapper{
+  display:flex;
+  flex: 0 1 auto;
+  }
+
+.sidepanel{
+  flex: 1 1 auto;
+}
+.hovedpanel{
+  flex: 0 1 850px;
+  /*border: 3px #c37900 solid;*/
+  min-width: 0;
+  display: flex;
+  flex-flow: column;
+}
+
+.vegrefModal{
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+
+.dimmed{
+  z-index: 10;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+
+  opacity: .5;
+  background: black;
+
+}
+
+.vegref-prompt{
+  z-index: 11;
+  color: black;
+  flex:0 1 500px;
+  background-color: white;
+  padding: 15px;
+  margin: 5px;
+  display: flex;
+  flex-flow: row wrap ;
+  justify-content: center
+}
+
+.vegref-prompt button{
+  width: 150px;
+  padding: 5px;
+  margin: 10px;
+  background-color:#ED9300;
+  border: 2px #e8af51 solid;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.vegref-prompt button:active{
+  opacity: .8;
+}
+
+#refMessage{
+  flex: 1 1 100%;
+}
+
+.vegref-prompt button{
+
+}
+
+button.accordion {
+    background-color: #e8af51;
+    color: #2E3539;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    font-weight: bold;
+    outline: none;
+    font-size: 1.3em;
+    transition: 0.4s;
+}
+
+button.accordion.active, button.accordion:hover {
+    background-color: #ED9300;
+}
+
+button.accordion:after {
+    content: '\002B';
+    color: #777;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+button.accordion.active:after {
+    content: "\2212";
+}
+
+div.panel {
+    padding: 0 18px;
+    background-color: white;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+h3{
+  margin-top: 40px;
+  font-style: italic;
+}
+
+.aapen{
+  max-height: 1500px !important;
+}
+
+.formitem{
+  margin-bottom: 25px;
+  font-size: 1.2em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.formitem label{
+  flex: 0 1 30%;
+  font-weight: bold;
+}
+
+small{
+  flex: 0 1 70%;
+  margin-left: auto;
+}
+
+.formitem input[type=text], .formitem input[type=name], .formitem input[type=email], .formitem select {
+    padding: 12px 20px;
+    margin: 8px 0;
+    background-color: #ede0ca;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1.1rem;
+    flex: 0 1 70%;
+    transition: all 0.5s;
+}
+
+#vegrefWrapper{
+  position: relative;
+  flex: 0 1 70%;
+}
+
+ #vegrefWrapper input{
+   width:100%
+ }
+
+#vegrefWrapper i{
+  position: absolute;
+  top: 23px;
+  right: 15px;
+  color:#8e8c8c;
+}
+
+#vegrefWrapper i:hover{
+  color:black
+}
+
+#prosjektVerdi{
+  font-weight: bold;
+}
+
+.invalid{
+  border: 2px solid red!important;
+}
+
+#dato input{
+  padding: 12px 20px;
+  margin: 8px 0;
+  background-color: #ede0ca;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1.1rem;
+}
+
+#dato [name="mnd"]{
+  width: 100px;
+}
+#dato [name="aar"]{
+  width: 140px;
+}
+
+.karttekst{
+  padding: 20px;
+}
+
+#prosjektinfo,#submit{
+  display: flex;
+  flex-flow: column;
+}
+
+#submit{
+  padding: 0 5%;
+  flex: 1 1 400px;
+  align-items: center;
+}
+
+#sluttmelding div, #sluttmelding p,#sluttmelding button,#sluttmelding{
+  margin-top: 15px;
+}
+
+#sluttmelding{
+  max-width: 600px;
+  }
+
+[name="nyttprosjekt"] {
+    background-color:#ED9300;
+    border: 2px #e8af51 solid;
+    padding: 15px 32px;
+    max-width: 250px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#vegrefDiv{
+  position: relative;
+  height: 60vh;
+  width: 100%;
+  border-radius: 5px;
+  max-height: 0;
+  transition: max-height 0.4s;
+  z-index: 1;
+}
+
+#kart{
+  padding:0;
+}
+
+#viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 80vh;
+  max-height: 700px;
+  width: 100%;
+
+}
+
+#baseToggle{
+/*position: relative;*/
+/*margin-right: 10px;*/
+}
+#baseToggle img{
+  left: 0px;
+  bottom: 0px;
+  border: 2px #ecc347 solid;
+  position: absolute;
+  transition: all 0.5s;
+  border-radius: 10px;
+}
+
+.esri-widget-button{
+  color: #705402 !important;
+  background-color: #ecc347 !important
+}
+
+.action-button {
+    background-color: #ECC347;
+    height: 31px;
+    width: 32px;
+    border: none;
+    color: black;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s
+}
+
+
+#freehandButton{
+  position: absolute;
+  bottom: 35px;
+  color:black;
+}
+
+#undoButton{
+  position: absolute;
+  bottom: 35px;
+  right: 36.5px;
+  color: black;
+  -webkit-transition: background-color 0.3s;
+  -webkit-transition: opacity 0.5s;
+  transition: background-color 0.3s;
+  transition: opacity 0.5s
+}
+
+
+#undoButton:active{
+  background-color: #0079c1;
+  color:white;
+}
+
+.action-button svg{
+  stroke:black;
+  stroke-width: 0.5;
+  fill:none;
+}
+
+.hide{
+  opacity: 0
+  /*display:none;*/
+}
+/* TODO: Fjern denne her etter jeg har funnet en god løsning på display:none transition */
+.borte{
+  display: none;
+}
+
+.aktiv {
+  background: #0079c1;
+  color: #e4e4e4;
+}
+
+.aktiv svg{
+  stroke:white !important;
+}
+
+@media only screen and (max-width: 600px) {
+    /* For mobile phones: */
+
+  .sidepanel{
+    display: none;
+  }
+
+  .hovedpanel{
+    flex: 0 1 850px;
+    min-width: 0;
+    border:none;
+  }
+
+  h2{
+    font-size: 1.3rem;
+  }
+
+  .formitem{
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+  }
+
+  .formitem>input,.formitem>select{
+    width: 100%;
+  }
+
+  #vegrefWrapper, #vegrefWrapper input{
+    width: 100%;
+  }
+
+  small{
+    flex: 1;
+    margin:inherit;
+  }
+
+  #baseToggle img{
+    -webkit-transform: scale(.6, .6); /* Safari */
+    transform: scale(.6, .6);
+    bottom:-14px;
+    left: -14px
+  }
+
+}
