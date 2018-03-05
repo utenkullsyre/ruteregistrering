@@ -262,6 +262,16 @@ require([
     var parkeringinfoKnapp = document.querySelector('#parkeringregistrering')
     var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]')
     var registrerTopp = document.querySelector('[name="regnytopp"]')
+    var parkeringkartDiv = document.querySelector('#parkeringViewDiv')
+    var viewDivTest = document.querySelector('#toppViewDiv');
+    var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]');
+    var nytoppknapp = document.querySelector('#nyTopp');
+    var valgInformasjon = {}
+
+    // console.log(velgnytopp);
+    var valgtToppResultatNoder = Array.prototype.map.call(valgtToppInfo, function (obj) {
+            console.log(obj);
+          })
 
     function resetKart(view){
       var fetthaal = view.ui.container
@@ -271,6 +281,31 @@ require([
       topp.definitionExpression = null
       console.log('Kart resett');
     }
+    function nyTopp(view){
+      topp.opacity = 0.3;
+      view.cursor = 'crosshair'
+    }
+    function leggTilPkt(kartpkt){
+      var point = {
+        type: "point",  // autocasts as new Point()
+        x: kartpkt.x,
+        y: kartpkt.y
+      };
+
+      // Create a symbol for drawing the point
+      var markerSymbol = {
+        type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+        size: 50,
+        color: [226, 119, 40]
+      };
+      var grafikk = new Graphic({
+        geometry: point,
+        symbol: markerSymbol
+      })
+      view.graphics.add(grafikk)
+      console.log("test", grafikk);
+      console.log(view.graphics);
+    }
     on(velgnytopp, 'click', function () {
       resetKart(view);
     });
@@ -279,20 +314,50 @@ require([
       toppinfoDiv.classList.remove('aapen')
       parkeringinfoDiv.classList.add('aapen')
       parkeringinfoKnapp.classList.add('active')
+      view.container = parkeringkartDiv
+      topp.visible = false;
+      parkering.visible = true;
+      parkeringkartDiv.classList.remove('borte')
     })
     on(nytoppknapp, 'click', function (event) {
-      console.log(topp);
-      console.log(event);
-      topp.opacity = 0.3;
+      nyTopp(view)
+      stateHandler = 'nyTopp'
+      console.log(stateHandler);
     })
-    on(registrerTopp, 'click', function() {
-      resetKart(view);
+    on(registrerTopp, 'click', function(event) {
+      resetKart(view, event.mapPoint);
       topp.opacity = 1;
       topp.definitionExpression = ''
     })
 
 
-    // baseToggle.classList.remove('hide')
+    on(view, 'click', function(event) {
+      console.log(event);
+      var hittest = {}
+      view.hitTest(event)
+      .then(function(response){
+        hittest = response
+        if (response.results.length > 0 && stateHandler === 'default') {
+          var resultat = response.results[0];
+          event.stopPropagation();
+          console.log(response.results[0]);
+          topp.definitionExpression = 'OBJECTID = ' + resultat.graphic.attributes.OBJECTID
+          view.ui.container.classList.add('borte')
+          valgtToppInfo.classList.remove('borte')
+          view.goTo({
+            target: event.mapPoint
+          })
+          viewDivTest.classList.add('halv-aapen')
+        } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
+          console.log('Statehandler = ' + stateHandler);
+          // leggTilPkt(event.mapPoint)
+        } else {
+          view.container.classList.add('borte')
+          view.container = null
+        }
+      })
+    })
+     // baseToggle.classList.remove('hide')
     // bilder.load().then(function () {
     //   map.allLayers.items.forEach(function (element) {
     //     lag[element.title] = element
@@ -353,45 +418,6 @@ require([
   //   refKnapp.classList.remove('hide')
   //   lukkRefKnapp.classList.remove('hide')
   // })
-
-  var viewDivTest = document.querySelector('#toppViewDiv');
-  var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]');
-  var nytoppknapp = document.querySelector('#nyTopp');
-  var valgInformasjon = {}
-
-  // console.log(velgnytopp);
-  var valgtToppResultatNoder = Array.prototype.map.call(valgtToppInfo, function (obj) {
-          console.log(obj);
-        })
-  on(view, 'click', function(event) {
-    console.log(event);
-    var hittest = {}
-    view.hitTest(event)
-    .then(function(response){
-      hittest = response
-      if (response.results.length > 0 && stateHandler === 'default') {
-        var resultat = response.results[0];
-        event.stopPropagation();
-        console.log(response.results[0]);
-        topp.definitionExpression = 'OBJECTID = ' + resultat.graphic.attributes.OBJECTID
-        view.ui.container.classList.add('borte')
-        valgtToppInfo.classList.remove('borte')
-        view.goTo({
-          target: event.mapPoint
-        })
-
-        viewDivTest.classList.add('halv-aapen')
-      } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
-        // var grafikk = new Graphic({
-        //   geometry:
-        // })
-        view.graphics.add()
-      } else {
-        view.container.classList.add('borte')
-        view.container = null
-      }
-    })
-  })
 
   // on(refKnapp, 'click', function () {
   //   var modal = document.querySelector('.vegrefModal')

@@ -231,7 +231,7 @@ textarea {
    resize: none;
 }
 
-#toppViewDiv{
+#toppViewDiv, #parkeringViewDiv{
   height: 60vh;
   width: 100%;
   border: 2px #1e699c solid;
