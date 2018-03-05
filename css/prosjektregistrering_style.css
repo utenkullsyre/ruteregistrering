@@ -232,34 +232,54 @@ textarea {
 }
 
 #toppViewDiv, #parkeringViewDiv{
+  position: relative;
   height: 60vh;
   width: 100%;
   border: 2px #1e699c solid;
   border-radius: 5px;
   /* max-height: 0; */
-  transition: all 0.6s;
+  transition: all 0.2s;
   margin-bottom: 30px;
 }
 
-#vegrefWrapper{
-  position: relative;
-  flex: 0 1 70%;
-}
-
- #vegrefWrapper input{
-   width:100%
- }
-
-#vegrefWrapper i{
+.map-ui-component {
   position: absolute;
-  top: 23px;
-  right: 15px;
-  color:#8e8c8c;
+  max-width: 400px;
 }
 
-#vegrefWrapper i:hover{
-  color:black
+.map-ui-component input[type=text], .map-ui-component input[type=text] {
+  margin: 10px;
+  position: absolute;
+  width: 30px;
+  box-sizing: border-box;
+  border: 2px solid #AFD7F6;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  background-image: url("../img/searchicon.png");
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  padding: 12px 0px 12px 40px;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+  max-width: 400px;
 }
+
+#sokResultat{
+  position: absolute;
+  top: 45px;
+  background-color: white;
+  /* border: 2px solid #AFD7F6; */
+  border-radius: 4px;
+  /* padding: 10px; */
+  max-height: 0px;
+}
+
+#toppViewDiv input[type=text]:focus {
+    width: 400px;
+}
+
+
 
 #prosjektVerdi{
   font-weight: bold;
@@ -431,6 +451,24 @@ textarea {
 
 @media only screen and (max-width: 600px) {
     /* For mobile phones: */
+
+  .map-ui-component{
+    width: 100%;
+  }
+
+  #sokResultat{
+    margin: 1px;
+  }
+
+  #toppViewDiv input[type=text], #parkeringViewDiv input[type=text] {
+    width: 30px;
+    margin: 1px;
+    max-width: 99%;
+  }
+
+  .esri-widget-button {
+    display: none;
+  }
 
   .sidepanel{
     display: none;

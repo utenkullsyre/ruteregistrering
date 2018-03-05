@@ -26,6 +26,12 @@
         <p>I denne seksjonen skal du enten velge en eksisterende topp eller registrere en ny topp.</p>
         <!-- Kartet for registrering eller velging av topp -->
         <div id="toppViewDiv">
+          <div class="map-ui-component">
+            <input type="text"  name="search" placeholder="Søk på stedsnavn">
+            <div id="sokResultat" class="borte">
+              <p>sdfgsd gsdfg sdfg sdfg sdfg sdfg sdfg sdfg sdf g</p>
+            </div>
+          </div>
           <button class="action-button esri-icon-map-pin" id="nyTopp" type="button"></button>
         </div>
         <form name="toppregistrering" class="borte">
@@ -78,6 +84,7 @@
         </p>
         <!-- Kartet for registrering eller velging av parkering -->
         <div id="parkeringViewDiv" class="borte">
+          <input type="text" class="map-ui-component" name="search" placeholder="Søk på stedsnavn">
         </div>
         <form name="parkeringregistrering" class="borte">
           <h3>Parkeringformasjon</h3>

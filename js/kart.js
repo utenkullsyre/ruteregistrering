@@ -121,7 +121,7 @@ require([
     view.extent = startVindu
   })
   view.ui.move('zoom', 'top-right')
-  view.ui.add('nyTopp', 'top-right')
+  view.ui.add('nyTopp', 'bottom-right')
   //  test = view;
 
   view.then(function (evt) {
@@ -266,7 +266,12 @@ require([
     var viewDivTest = document.querySelector('#toppViewDiv');
     var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]');
     var nytoppknapp = document.querySelector('#nyTopp');
+    var uiComponents = document.querySelector('.map-ui-component');
+    var sokinput = document.querySelector('.map-ui-component input[type=text]')
+    console.log(sokinput);
+
     var valgInformasjon = {}
+    // uiComponents.push(view.ui.container)
 
     // console.log(velgnytopp);
     var valgtToppResultatNoder = Array.prototype.map.call(valgtToppInfo, function (obj) {
@@ -276,6 +281,7 @@ require([
     function resetKart(view){
       var fetthaal = view.ui.container
       fetthaal.classList.remove('borte');
+      uiComponents.classList.remove('borte')
       view.container.classList.remove('halv-aapen');
       valgtToppInfo.classList.add('borte')
       topp.definitionExpression = null
@@ -306,8 +312,15 @@ require([
       console.log("test", grafikk);
       console.log(view.graphics);
     }
+    function toggleUi(view){
+
+    }
     on(velgnytopp, 'click', function () {
       resetKart(view);
+      view.goTo({
+        target: event.mapPoint,
+        zoom: 9
+      })
     });
     on(velgtopp, 'click', function() {
       toppinfoKnapp.classList.remove('active')
@@ -329,6 +342,10 @@ require([
       topp.opacity = 1;
       topp.definitionExpression = ''
     })
+    on(sokinput, 'key-up', function () {
+      alert('dfghdfghdfgh')
+      document.querySelector('#sokResultat').classList.remove('borte')
+    })
 
 
     on(view, 'click', function(event) {
@@ -343,11 +360,14 @@ require([
           console.log(response.results[0]);
           topp.definitionExpression = 'OBJECTID = ' + resultat.graphic.attributes.OBJECTID
           view.ui.container.classList.add('borte')
+          uiComponents.classList.add('borte')
+          console.log(uiComponents.classList);
           valgtToppInfo.classList.remove('borte')
-          view.goTo({
-            target: event.mapPoint
-          })
           viewDivTest.classList.add('halv-aapen')
+          view.goTo({
+            target: event.mapPoint,
+            zoom: 9
+          })
         } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
           console.log('Statehandler = ' + stateHandler);
           // leggTilPkt(event.mapPoint)
