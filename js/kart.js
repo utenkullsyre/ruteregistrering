@@ -316,11 +316,9 @@ require([
 
     }
     on(velgnytopp, 'click', function () {
-      resetKart(view);
       view.goTo({
-        target: event.mapPoint,
-        zoom: 9
-      })
+        target: event.mapPoint
+      }).then(resetKart(view))
     });
     on(velgtopp, 'click', function() {
       toppinfoKnapp.classList.remove('active')
@@ -362,13 +360,12 @@ require([
           view.ui.container.classList.add('borte')
           uiComponents.classList.add('borte')
           console.log(uiComponents.classList);
-          valgtToppInfo.classList.remove('borte')
           view.goTo({
-            target: event.mapPoint,
-            zoom: 9
-          }).then(function(){
-            viewDivTest.classList.add('halv-aapen')
+            target: event.mapPoint
           })
+          valgtToppInfo.classList.remove('borte')
+          viewDivTest.classList.add('halv-aapen')
+
 
 
         } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
