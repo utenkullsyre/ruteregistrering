@@ -237,7 +237,7 @@ textarea {
   width: 100%;
   border: 2px #1e699c solid;
   border-radius: 5px;
-  /* max-height: 0; */
+  max-height: 60vh;
   transition: all 0.2s;
   margin-bottom: 30px;
 }
