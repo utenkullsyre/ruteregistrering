@@ -15,9 +15,9 @@
     <div class="sidepanel"></div>
     <div class="hovedpanel">
       <div id="header">
-        <img id="logo" src="img\logo.png">
+        <img id="logo" src="img\mountain.svg">
         <h2>Turregistrering</h2>
-        <img id="strek" src="img\strek.png">
+        <span>?</span>
       </div>
       <!-- Fjelltoppseksjon -->
       <button id="toppdetaljer" class="accordion active">Toppinfo</button>
@@ -56,16 +56,16 @@
           </div>
         </form>
 
-        <div name="valgt-parkering-info"  class="borte">
-          <p>Navn: <span id="toppnavn"></span></p>
-          <p>Høyde: <span id="hoyde"></span></p>
-          <p>Beskrivelse: <span id="beskrivelse"></span></p>
-          <p>Merknad: <span id="merknad"></span></p>
-          <p>Er dette riktig topp?</p>
-          <div class="">
-            <button type="button">Velg topp</button>
-            <button type="button">Velg ny topp</button>
-            <button type="button">Registrer ny topp</button>
+        <div name="valgt-topp-info"  class="borte">
+          <p><b>Navn:</b> <span id="toppnavn">Spanstinden</span></p>
+          <p><b>Høyde:</b> <span id="hoyde">1345 moh.</span></p>
+          <p><b>Beskrivelse:</b> <span id="beskrivelse">Et fjell som ligger nær veien og gir en fantastisk utsikt. Fjellet har mange rutealternativer og er helt klart en topp som bør være på alle sin ønskeliste.</span></p>
+          <p><b>Merknad:</b> <span id="merknad">Ingen registrerte merknader</span></p>
+          <p><i>Er dette riktig topp?</i></p>
+          <div class="knapperad">
+            <button type="button" class="knapp" name="velgtopp">Velg topp</button>
+            <button type="button" class="knapp" name="velgnytopp">Finn annen topp</button>
+            <button type="button" class="knapp" name="regnytopp">Registrer ny topp</button>
           </div>
         </div>
 
@@ -81,14 +81,20 @@
         </div>
         <form name="parkeringregistrering">
           <h3>Parkeringformasjon</h3>
+
+          <div class="formitem">
+            <label for="parkeringnavn">Navn *</label>
+            <input type="text" name="parkeringnavn" placeholder="Skriv inn parkeringsplassens navn" required>
+          </div>
+
           <div class="formitem">
             <label for="">Antall parkeringsplasser *</label>
             <select name="vegavdeling" required>
               <option value="" disabled selected>Velg antall parkeringsplasser</option>
-              <option value="Finnmark">Finnmark</option>
-              <option value="Troms">Troms</option>
-              <option value="Midtre-Hålogaland">Midtre-Hålogaland</option>
-              <option value="Nordland">Nordland</option>
+              <option value="0 - 5">0 - 5</option>
+              <option value="5 - 10">5 - 10</option>
+              <option value="10 - 15">10 - 15</option>
+              <option value="15 +">15 +</option>
             </select>
           </div>
 

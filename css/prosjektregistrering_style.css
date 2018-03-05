@@ -32,14 +32,20 @@ a:hover{
   background-color: #45515A;
   justify-content:  space-between;
   align-items: center;
-  border-bottom: 1px #c37900 solid;
+  border-bottom: 1px #395c8b solid;
   position: relative;
   overflow: hidden;
 }
 
+#header span{
+  font-size: 2.3em;
+  margin: 10px;
+}
+
 #logo{
   left: 0;
-  height: 40px
+  height: 40px;
+  margin: 10px;
 }
 
 #strek{
@@ -123,7 +129,7 @@ a:hover{
 }
 
 button.accordion {
-    background-color: #e8af51;
+    background-color: #afd9f6;
     color: #2E3539;
     cursor: pointer;
     padding: 18px;
@@ -136,8 +142,8 @@ button.accordion {
     transition: 0.4s;
 }
 
-button.accordion.active, button.accordion:hover {
-    background-color: #ED9300;
+button.accordion.active {
+    background-color: #83b6d9;
 }
 
 button.accordion:after {
@@ -150,6 +156,24 @@ button.accordion:after {
 
 button.accordion.active:after {
     content: "\2212";
+}
+
+.knapp{
+  padding: 5px;
+  margin: 5px;
+  background-color: #83b6d9;
+  border: 2px #1e699c solid;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.knapperad {
+  margin-bottom: 15px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
 }
 
 div.panel {
@@ -210,9 +234,10 @@ textarea {
 #toppViewDiv{
   height: 60vh;
   width: 100%;
+  border: 2px #1e699c solid;
   border-radius: 5px;
   /* max-height: 0; */
-  transition: all 0.3s;
+  transition: all 0.6s;
   margin-bottom: 30px;
 }
 
@@ -337,13 +362,13 @@ textarea {
   border-radius: 10px;
 }
 
-.esri-widget-button{
+/* {
   color: #705402 !important;
   background-color: #ecc347 !important
-}
+} */
 
-.action-button {
-    background-color: #ECC347;
+.action-button, .esri-widget-button {
+    background-color: #afd9f6;
     height: 31px;
     width: 32px;
     border: none;

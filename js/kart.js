@@ -250,31 +250,63 @@ require([
   })
 
   view.when(function () {
-    var nytoppknapp = document.querySelector('#nyTopp');
+    var velgnytopp = document.querySelector('[name="velgnytopp"]')
+    var velgtopp = document.querySelector('[name="velgtopp"]')
     var baseToggle = document.querySelector('#baseToggle')
     var img = document.querySelectorAll('#baseToggle img')
+    var nytoppknapp = document.querySelector('#nyTopp')
+    var toppinfoDiv = document.querySelector('#toppinfo')
+    var toppinfoKnapp = document.querySelector('#toppdetaljer')
+    var parkeringinfoDiv = document.querySelector('#parkeringinfo')
+    var parkeringinfoKnapp = document.querySelector('#parkeringregistrering')
+    var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]')
+    var registrerTopp = document.querySelector('[name="regnytopp"]')
 
-    baseToggle.classList.remove('hide')
-    bilder.load().then(function () {
-      map.allLayers.items.forEach(function (element) {
-        lag[element.title] = element
-      })
-      baseToggle.addEventListener('click', function () {
-        img[0].classList.toggle('hide')
-        img[1].classList.toggle('hide')
-
-        lag.GeocacheBilder.visible = !lag.GeocacheBilder.visible
-        lag.GeocacheTrafikkJPG.visible = !lag.GeocacheTrafikkJPG.visible
-      })
+    function resetKart(view){
+      var fetthaal = view.ui.container
+      fetthaal.classList.remove('borte');
+      view.container.classList.remove('halv-aapen');
+      valgtToppInfo.classList.add('borte')
+      topp.definitionExpression = null
+      console.log('Kart resett');
+    }
+    on(velgnytopp, 'click', function () {
+      resetKart(view);
+    });
+    on(velgtopp, 'click', function() {
+      toppinfoKnapp.classList.remove('active')
+      toppinfoDiv.classList.remove('aapen')
+      parkeringinfoDiv.classList.add('aapen')
+      parkeringinfoKnapp.classList.add('active')
     })
-  //   console.log(nytoppknapp);
-  //
-  //   on(document.querySelector('#nyTopp'), 'click', function (event) {
-  //     console.log(topp);
-  //     console.log(event);
-  //     topp.opacity = 0.5
-  //   })
-  // })
+    on(nytoppknapp, 'click', function (event) {
+      console.log(topp);
+      console.log(event);
+      topp.opacity = 0.3;
+    })
+    on(registrerTopp, 'click', function() {
+      resetKart(view);
+      topp.opacity = 1;
+      topp.definitionExpression = ''
+    })
+
+
+    // baseToggle.classList.remove('hide')
+    // bilder.load().then(function () {
+    //   map.allLayers.items.forEach(function (element) {
+    //     lag[element.title] = element
+    //   })
+    //   baseToggle.addEventListener('click', function () {
+    //     img[0].classList.toggle('hide')
+    //     img[1].classList.toggle('hide')
+    //
+    //     lag.GeocacheBilder.visible = !lag.GeocacheBilder.visible
+    //     lag.GeocacheTrafikkJPG.visible = !lag.GeocacheTrafikkJPG.visible
+    //   })
+    // })
+  }).otherwise(function(error){
+    console.log('Kartlastningmelding', error);
+  })
 
   function oppdaterFeatureLayer (skjemaItems, grafikk, featurelag) {
     Array.prototype.map.call(skjemaItems, function (obj) {
@@ -304,13 +336,13 @@ require([
     })
   }
 
-  var vegrefView = new MapView({
-    map: map,
-    container: 'vegrefDiv'
-  })
-
-  var refKnapp = document.querySelector('#vegrefIcon')
-  var lukkRefKnapp = document.querySelector('#lukkVegref')
+  // var vegrefView = new MapView({
+  //   map: map,
+  //   container: 'vegrefDiv'
+  // })
+  //
+  // var refKnapp = document.querySelector('#vegrefIcon')
+  // var lukkRefKnapp = document.querySelector('#lukkVegref')
 
   // vegrefView.constraints.rotationEnabled = false
   // vegrefView.extent = startVindu
@@ -322,8 +354,14 @@ require([
   // })
 
   var viewDivTest = document.querySelector('#toppViewDiv');
-  var valgtToppInfo = document.querySelector('[name="valgt-parkering-info"]');
+  var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]');
+  var nytoppknapp = document.querySelector('#nyTopp');
+  var valgInformasjon = {}
 
+  // console.log(velgnytopp);
+  var valgtToppResultatNoder = Array.prototype.map.call(valgtToppInfo, function (obj) {
+          console.log(obj);
+        })
   on(view, 'click', function(event) {
     console.log(event);
     var hittest = {}
@@ -347,6 +385,9 @@ require([
         //   geometry:
         // })
         view.graphics.add()
+      } else {
+        view.container.classList.add('borte')
+        view.container = null
       }
     })
   })
