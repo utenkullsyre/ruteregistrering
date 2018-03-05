@@ -363,11 +363,14 @@ require([
           uiComponents.classList.add('borte')
           console.log(uiComponents.classList);
           valgtToppInfo.classList.remove('borte')
-          viewDivTest.classList.add('halv-aapen')
           view.goTo({
             target: event.mapPoint,
             zoom: 9
+          }).then(function(){
+            viewDivTest.classList.add('halv-aapen')
           })
+
+
         } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
           console.log('Statehandler = ' + stateHandler);
           // leggTilPkt(event.mapPoint)
