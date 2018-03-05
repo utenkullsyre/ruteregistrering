@@ -120,6 +120,7 @@ require([
   view.when(function () {
     view.extent = startVindu
   })
+  view.ui.move('zoom', 'top-right')
   view.ui.add('nyTopp', 'top-right')
   //  test = view;
 

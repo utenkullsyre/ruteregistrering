@@ -48,11 +48,11 @@ function testSkjemadrit (element) {
 //   vegrefDiv.classList.add('aapen')
 // })
 
-Array.prototype.map.call(skjemaItems, function (obj) {
-  obj.addEventListener('focusout', function () {
-    testSkjemadrit(this)
-  })
-})
+// Array.prototype.map.call(skjemaItems, function (obj) {
+//   obj.addEventListener('focusout', function () {
+//     testSkjemadrit(this)
+//   })
+// })
 
 // kart.addEventListener('click', function () {
 //   if (skjemaValidering()) {
