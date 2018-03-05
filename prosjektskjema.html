@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Prosjektregistrering</title>
+  <title>Turregistrering</title>
   <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="css\prosjektregistrering_style.css">
@@ -22,19 +22,65 @@
       <!-- Fjelltoppseksjon -->
       <button id="toppdetaljer" class="accordion active">Toppinfo</button>
       <div id="toppinfo" class="panel aapen">
-        <p>I denne seksjonen skal du enten velge en eksisterende topp eller registrere en ny topp.
-           <br/>Felter merket med * er obligatoriske
-        </p>
+        <h3>Toppinformasjon</h3>
+        <p>I denne seksjonen skal du enten velge en eksisterende topp eller registrere en ny topp.</p>
         <!-- Kartet for registrering eller velging av topp -->
         <div id="toppViewDiv">
+          <button class="action-button esri-icon-map-pin" id="nyTopp" type="button"></button>
         </div>
-        <form name="toppregistrering">
-          <h3>Toppinformasjon</h3>
+        <form name="toppregistrering" class="borte">
+          <p>Felter merket med * er obligatoriske</p>
           <div class="formitem">
             <label for="toppnavn">Navn *</label>
             <input type="text" name="toppnavn" placeholder="Skriv inn fjellets navn" required>
           </div>
 
+          <div class="formitem">
+            <label for="topphoyde">Høyde *</label>
+            <div id="dato">
+              <input type="number" min="0" max="2700" name="topphoyde" placeholder="moh" required>
+            </div>
+          </div>
+
+          <div class="formitem">
+            <label for="beskrivelse">Beskrivelse *</label>
+            <textarea  name="beskrivelse" placeholder="Skriv inn en beskrivelse av turen" rows="8" cols="80"></textarea>
+          </div>
+
+          <div class="formitem">
+            <label for="merknad">Merknad</label>
+            <textarea  name="merknad" placeholder="Skriv inn en merknad av turen om det finnes noen" rows="8" cols="80"></textarea>
+          </div>
+
+          <div id="valideringForm" class="message">
+          </div>
+        </form>
+
+        <div name="valgt-parkering-info"  class="borte">
+          <p>Navn: <span id="toppnavn"></span></p>
+          <p>Høyde: <span id="hoyde"></span></p>
+          <p>Beskrivelse: <span id="beskrivelse"></span></p>
+          <p>Merknad: <span id="merknad"></span></p>
+          <p>Er dette riktig topp?</p>
+          <div class="">
+            <button type="button">Velg topp</button>
+            <button type="button">Velg ny topp</button>
+            <button type="button">Registrer ny topp</button>
+          </div>
+        </div>
+
+      </div>
+      <!-- Parkerings-seksjon -->
+      <button id="parkeringregistrering" class="accordion">Parkering</button>
+      <div id="parkeringinfo" class="panel">
+        <p>I denne seksjonen skal du enten velge en allerede registrert parkering eller registrere en ny parkering.
+           <br/>Felter merket med * er obligatoriske
+        </p>
+        <!-- Kartet for registrering eller velging av parkering -->
+        <div id="parkeringViewDiv">
+        </div>
+        <form name="parkeringregistrering">
+          <h3>Parkeringformasjon</h3>
           <div class="formitem">
             <label for="">Antall parkeringsplasser *</label>
             <select name="vegavdeling" required>
@@ -59,19 +105,22 @@
             <label for="merknad">Merknad</label>
             <textarea  name="merknad" placeholder="Skriv inn en merknad om parkeringen om det finnes noen" rows="8" cols="80"></textarea>
           </div>
+
+
         </form>
-        <div name="valgt-parkering-info" class="">
-          <p>Navn: <span id="toppnavn"></span></p>
-          <p>Høyde: <span id="hoyde"></span></p>
-          <p>Beskrivelse: <span id="beskrivelse"></span></p>
+        <div name="valgt-topp-info" class="">
+          <p>Navn: <span id="parkeringnavn"></span></p>
+          <p>Antall parkeringsplasser: <span id="antparkering"></span></p>
+          <p>Vinterbrøytet: <span id="vinterbroytet"></span></p>
           <p>Merknad: <span id="merknad"></span></p>
         </div>
         <div id="valideringForm" class="message">
         </div>
       </div>
-      <!-- Parkerings-seksjon -->
-      <button id="parkeringregistrering" class="accordion">Parkering</button>
-      <div id="parkeringinfo" class="panel aapen">
+
+      <!-- Registrer rute -->
+      <button id="parkeringregistrering" class="accordion">Rute</button>
+      <div id="parkeringinfo" class="panel">
         <p>I denne seksjonen skal du enten velge en allerede registrert parkering eller registrere en ny parkering.
            <br/>Felter merket med * er obligatoriske
         </p>
@@ -79,28 +128,38 @@
         <div id="parkeringViewDiv">
         </div>
         <form name="parkeringregistrering">
-          <h3>Parkeringformasjon</h3>
+          <h3>Ruteinformasjon</h3>
           <div class="formitem">
-            <label for="topphoyde">Høyde *</label>
-            <div id="dato">
-              <input type="number" min="0" max="2700" name="topphoyde" placeholder="moh" required>
-            </div>
+            <label for="">Antall parkeringsplasser *</label>
+            <select name="vegavdeling" required>
+              <option value="" disabled selected>Velg antall parkeringsplasser</option>
+              <option value="Finnmark">Finnmark</option>
+              <option value="Troms">Troms</option>
+              <option value="Midtre-Hålogaland">Midtre-Hålogaland</option>
+              <option value="Nordland">Nordland</option>
+            </select>
           </div>
 
           <div class="formitem">
-            <label for="beskrivelse">Beskrivelse *</label>
-            <textarea  name="beskrivelse" placeholder="Skriv inn en beskrivelse av turen" rows="8" cols="80"></textarea>
+            <label for="">Vinterbrøytet *</label>
+            <select name="vegavdeling" required>
+              <option value="" disabled selected>Velg alternativ</option>
+              <option value="ja">Ja</option>
+              <option value="nei">Nei</option>
+            </select>
           </div>
 
           <div class="formitem">
             <label for="merknad">Merknad</label>
-            <textarea  name="merknad" placeholder="Skriv inn en merknad av turen om det finnes noen" rows="8" cols="80"></textarea>
+            <textarea  name="merknad" placeholder="Skriv inn en merknad om parkeringen om det finnes noen" rows="8" cols="80"></textarea>
           </div>
+
+
         </form>
         <div name="valgt-topp-info" class="">
-          <p>Navn: <span id="toppnavn"></span></p>
-          <p>Høyde: <span id="hoyde"></span></p>
-          <p>Beskrivelse: <span id="beskrivelse"></span></p>
+          <p>Navn: <span id="parkeringnavn"></span></p>
+          <p>Antall parkeringsplasser: <span id="antparkering"></span></p>
+          <p>Vinterbrøytet: <span id="vinterbroytet"></span></p>
           <p>Merknad: <span id="merknad"></span></p>
         </div>
         <div id="valideringForm" class="message">

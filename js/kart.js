@@ -39,9 +39,10 @@ require([
    * To load a WebMap from an on-premise portal, set the portal
    * url with esriConfig.portalUrl.
    ************************************************************/
-  var nvdbBasemap = new TileLayer({
-    url: 'https://nvdbcache.geodataonline.no/arcgis/rest/services/Trafikkportalen/GeocacheTrafikkJPG/MapServer',
-    id: 'NVDB-trafikk'
+  var graatone = new TileLayer({
+    url: 'https://services.geodataonline.no/arcgis/rest/services/Geocache_UTM33_EUREF89/GeocacheGraatone/MapServer',
+    id: 'Gråtone',
+    visible: true
   })
   var bilder = new TileLayer({
     url: 'https://services.geodataonline.no/arcgis/rest/services/Geocache_UTM33_EUREF89/GeocacheBilder/MapServer',
@@ -49,22 +50,24 @@ require([
     visible: false
   })
 
-  var linje = new FeatureLayer({
-    url: 'https://services1.arcgis.com/oc32TmBcUxTXagmW/ArcGIS/rest/services/Prosjekter___SVV/FeatureServer/0',
+  var topp = new FeatureLayer({
+    id: 'topp',
+    portalItem: {
+      id: "03ecdbb776314ca0b99388156da4cd41"
+    },
+    visible: true
+  })
+
+  var parkering = new FeatureLayer({
+    id: 'parkering',
+    portalItem: {
+      id: "5b00dc4c792140f99af2fdd9978384e4"
+    },
     visible: false
   })
 
-  var flate = new FeatureLayer({
-    url: 'https://services1.arcgis.com/oc32TmBcUxTXagmW/ArcGIS/rest/services/Prosjekter___SVV/FeatureServer/1',
-    visible: false
-  })
-
-  var bakke = ElevationLayer({
-    url: 'https://services.geodataonline.no/arcgis/rest/services/Geocache_UTM33_EUREF89/GeocacheTerreng/ImageServer'
-  })
-  bakkeLag = bakke
   var baseMap = new Basemap({
-    baseLayers: [nvdbBasemap],
+    baseLayers: [graatone, bilder],
     title: 'NVDB',
     id: 'nvdb'
   })
@@ -72,11 +75,10 @@ require([
    // Create a Map instance
   var map = new Map({
     basemap: baseMap,
-    ground: new Ground({
-      layers: [bakke]
-    }),
-    layers: [bilder, linje, flate]
+    layers: [topp, parkering]
   })
+
+  var stateHandler = 'default';
 
   kart = map
 
@@ -93,7 +95,7 @@ require([
    ************************************************************/
   var view = new MapView({
     map: map,
-    container: 'viewDiv'
+    container: 'toppViewDiv'
   })
   view.constraints.rotationEnabled = false
 
@@ -104,6 +106,7 @@ require([
       // graphic placed at the location of the user when found
     })
   })
+
 
   var searchWidget = new Search({
     view: view
@@ -117,15 +120,7 @@ require([
   view.when(function () {
     view.extent = startVindu
   })
-  view.ui.add('baseToggle', 'bottom-left')
-  //  view.ui.add(layerList, 'top-left');
-
-  view.ui.add(locateWidget, 'top-left')
-  view.ui.add(searchWidget, {
-    position: 'top-right',
-    index: 0
-  })
-  view.ui.add('topbar', 'bottom-right')
+  view.ui.add('nyTopp', 'top-right')
   //  test = view;
 
   view.then(function (evt) {
@@ -177,65 +172,65 @@ require([
  // ****************************************
  // activate the sketch to create a polyline
  // ****************************************
-    var drawLineButton = document.getElementById('polylineButton')
-    drawLineButton.onclick = function () {
-      freehandIcon.classList.remove('hide')
-      undoIcon.classList.remove('hide')
-      if (view.graphics.length > 0) {
-        if (view.graphics.items[0].symbol.type === 'picture-marker') {
-          view.graphics.removeAll()
-        }
-      }
-   // set the sketch to create a polyline geometry
-      sketchViewModel.create('polyline')
-      sketchViewModel.draw.activeAction._dragEnabled = false
-      setActiveButton(this)
-    }
+   //  var drawLineButton = document.getElementById('polylineButton')
+   //  drawLineButton.onclick = function () {
+   //    freehandIcon.classList.remove('hide')
+   //    undoIcon.classList.remove('hide')
+   //    if (view.graphics.length > 0) {
+   //      if (view.graphics.items[0].symbol.type === 'picture-marker') {
+   //        view.graphics.removeAll()
+   //      }
+   //    }
+   // // set the sketch to create a polyline geometry
+   //    sketchViewModel.create('polyline')
+   //    sketchViewModel.draw.activeAction._dragEnabled = false
+   //    setActiveButton(this)
+   //  }
 
  // ***************************************
  // activate the sketch to create a polygon
  // ***************************************
-    var drawPolygonButton = document.getElementById('polygonButton')
-    drawPolygonButton.onclick = function (event) {
-      freehandIcon.classList.remove('hide')
-      undoIcon.classList.remove('hide')
-      view.graphics.removeAll()
-   // set the sketch to create a polygon geometry
-      sketchViewModel.create('polygon')
-      sketchViewModel.draw.activeAction._dragEnabled = false
-      sketchViewModel.draw.activeAction.on('vertex-add', function (evt) {
-        if (evt.native.ctrlKey) {
-          evt.preventDefault()
-        }
-      // if(evt.native.offsetY == dragEvent.end.y || evt.native.offsetY == dragEvent.start.y){
-      //   evt.preventDefault();
-      //   console.log('Det funka!!',evt);
-      // }
-      })
-      setActiveButton(this)
-    }
+   //  var drawPolygonButton = document.getElementById('polygonButton')
+   //  drawPolygonButton.onclick = function (event) {
+   //    freehandIcon.classList.remove('hide')
+   //    undoIcon.classList.remove('hide')
+   //    view.graphics.removeAll()
+   // // set the sketch to create a polygon geometry
+   //    sketchViewModel.create('polygon')
+   //    sketchViewModel.draw.activeAction._dragEnabled = false
+   //    sketchViewModel.draw.activeAction.on('vertex-add', function (evt) {
+   //      if (evt.native.ctrlKey) {
+   //        evt.preventDefault()
+   //      }
+   //    // if(evt.native.offsetY == dragEvent.end.y || evt.native.offsetY == dragEvent.start.y){
+   //    //   evt.preventDefault();
+   //    //   console.log('Det funka!!',evt);
+   //    // }
+   //    })
+   //    setActiveButton(this)
+   //  }
 
  // **************
  // reset button
  // **************
-    document.getElementById('resetBtn').onclick = function () {
-      freehandIcon.classList.add('hide')
-      undoIcon.classList.add('hide')
-      view.graphics.removeAll()
-      sketchViewModel.reset()
-      setActiveButton()
-    }
+    // document.getElementById('resetBtn').onclick = function () {
+    //   freehandIcon.classList.add('hide')
+    //   undoIcon.classList.add('hide')
+    //   view.graphics.removeAll()
+    //   sketchViewModel.reset()
+    //   setActiveButton()
+    // }
 
-    freehandIcon.addEventListener('click', function () {
-      if (sketchViewModel.draw.activeAction) {
-        sketchViewModel.draw.activeAction._dragEnabled = !sketchViewModel.draw.activeAction._dragEnabled
-        this.classList.toggle('aktiv')
-      }
-    })
+    // freehandIcon.addEventListener('click', function () {
+    //   if (sketchViewModel.draw.activeAction) {
+    //     sketchViewModel.draw.activeAction._dragEnabled = !sketchViewModel.draw.activeAction._dragEnabled
+    //     this.classList.toggle('aktiv')
+    //   }
+    // })
 
-    undoIcon.addEventListener('click', function () {
-      sketchViewModel.draw.activeAction.undo()
-    })
+    // undoIcon.addEventListener('click', function () {
+    //   sketchViewModel.draw.activeAction.undo()
+    // })
 
     function setActiveButton (selectedButton) {
    // focus the view to activate keyboard shortcuts for sketching
@@ -255,6 +250,7 @@ require([
   })
 
   view.when(function () {
+    var nytoppknapp = document.querySelector('#nyTopp');
     var baseToggle = document.querySelector('#baseToggle')
     var img = document.querySelectorAll('#baseToggle img')
 
@@ -271,7 +267,14 @@ require([
         lag.GeocacheTrafikkJPG.visible = !lag.GeocacheTrafikkJPG.visible
       })
     })
-  })
+  //   console.log(nytoppknapp);
+  //
+  //   on(document.querySelector('#nyTopp'), 'click', function (event) {
+  //     console.log(topp);
+  //     console.log(event);
+  //     topp.opacity = 0.5
+  //   })
+  // })
 
   function oppdaterFeatureLayer (skjemaItems, grafikk, featurelag) {
     Array.prototype.map.call(skjemaItems, function (obj) {
@@ -309,64 +312,94 @@ require([
   var refKnapp = document.querySelector('#vegrefIcon')
   var lukkRefKnapp = document.querySelector('#lukkVegref')
 
-  vegrefView.constraints.rotationEnabled = false
-  vegrefView.extent = startVindu
-  vegrefView.ui.add('vegrefIcon', 'top-left')
-  vegrefView.ui.add('lukkVegref', 'top-right')
-  vegrefView.when(function () {
-    refKnapp.classList.remove('hide')
-    lukkRefKnapp.classList.remove('hide')
-  })
+  // vegrefView.constraints.rotationEnabled = false
+  // vegrefView.extent = startVindu
+  // vegrefView.ui.add('vegrefIcon', 'top-left')
+  // vegrefView.ui.add('lukkVegref', 'top-right')
+  // vegrefView.when(function () {
+  //   refKnapp.classList.remove('hide')
+  //   lukkRefKnapp.classList.remove('hide')
+  // })
 
-  on(refKnapp, 'click', function () {
-    var modal = document.querySelector('.vegrefModal')
-    var meldingTekst = document.querySelector('.vegref-prompt p')
-    var jaKnapp = document.querySelector('[name="yes"]')
-    var nyttSok = document.querySelector('[name="newsearch"]')
-    vegrefDiv.style.cursor = 'crosshair'
-    on.once(vegrefView, 'click', function (evt) {
-      vegrefDiv.style.cursor = 'default'
-      evt.stopPropagation()
-      if (evt.mapPoint) {
-        var url = 'https://www.vegvesen.no/nvdb/api/v2/posisjon.json?nord=' + evt.mapPoint.y + '&ost=' + evt.mapPoint.x
-        var oReq = new XMLHttpRequest()
-        oReq.open('GET', url, true)
-        oReq.onload = function (oEvent) {
-          on.once(nyttSok, 'click', function () {
-            modal.classList.add('borte')
-            vegrefDiv.style.cursor = 'default'
-          })
-          if (oReq.status === 200) {
-            jaKnapp.classList.remove('borte')
-            var querySvar = JSON.parse(oReq.response) // Sender tekst tilbake fra php-scriptet
-            meldingTekst.innerHTML = '<p>Funnet vegreferanse er: <b>' +
-                                      querySvar[0].vegreferanse.kortform +
-                                      '</b>.</p><p>Vil du legge til denne vegreferansen eller søke på nytt?</p>'
-            modal.classList.remove('borte')
-            on.once(jaKnapp, 'click', function () {
-              document.querySelector('[name="vegreferanse"]').value = querySvar[0].vegreferanse.kortform
-              view.extent = vegrefView.extent
-              modal.classList.add('borte')
-              vegrefDiv.classList.remove('aapen')
-              vegrefDiv.style.cursor = 'default'
-              console.log(vegrefView)
-            })
-          } else if ((oReq.status === 404)) {
-            meldingTekst.innerHTML = '<p>Avstanden til nærmeste veg er for lang. Søk på nytt og klikk nærmere vegkroppen</p>'
-            modal.classList.remove('borte')
-            jaKnapp.classList.add('borte')
-          }
-        }
-        oReq.send()
+  var viewDivTest = document.querySelector('#toppViewDiv');
+  var valgtToppInfo = document.querySelector('[name="valgt-parkering-info"]');
+
+  on(view, 'click', function(event) {
+    console.log(event);
+    var hittest = {}
+    view.hitTest(event)
+    .then(function(response){
+      hittest = response
+      if (response.results.length > 0 && stateHandler === 'default') {
+        var resultat = response.results[0];
+        event.stopPropagation();
+        console.log(response.results[0]);
+        topp.definitionExpression = 'OBJECTID = ' + resultat.graphic.attributes.OBJECTID
+        view.ui.container.classList.add('borte')
+        valgtToppInfo.classList.remove('borte')
+        view.goTo({
+          target: event.mapPoint
+        })
+
+        viewDivTest.classList.add('halv-aapen')
+      } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
+        // var grafikk = new Graphic({
+        //   geometry:
+        // })
+        view.graphics.add()
       }
     })
-    // vegrefDiv.style.cursor = "crosshair"
-    // Ajax-kall for å hente inn vegrefDiv
   })
 
-  lukkRefKnapp.addEventListener('click', function () {
-    vegrefDiv.classList.remove('aapen')
-  })
+  // on(refKnapp, 'click', function () {
+  //   var modal = document.querySelector('.vegrefModal')
+  //   var meldingTekst = document.querySelector('.vegref-prompt p')
+  //   var jaKnapp = document.querySelector('[name="yes"]')
+  //   var nyttSok = document.querySelector('[name="newsearch"]')
+  //   vegrefDiv.style.cursor = 'crosshair'
+  //   on.once(vegrefView, 'click', function (evt) {
+  //     vegrefDiv.style.cursor = 'default'
+  //     evt.stopPropagation()
+  //     if (evt.mapPoint) {
+  //       var url = 'https://www.vegvesen.no/nvdb/api/v2/posisjon.json?nord=' + evt.mapPoint.y + '&ost=' + evt.mapPoint.x
+  //       var oReq = new XMLHttpRequest()
+  //       oReq.open('GET', url, true)
+  //       oReq.onload = function (oEvent) {
+  //         on.once(nyttSok, 'click', function () {
+  //           modal.classList.add('borte')
+  //           vegrefDiv.style.cursor = 'default'
+  //         })
+  //         if (oReq.status === 200) {
+  //           jaKnapp.classList.remove('borte')
+  //           var querySvar = JSON.parse(oReq.response) // Sender tekst tilbake fra php-scriptet
+  //           meldingTekst.innerHTML = '<p>Funnet vegreferanse er: <b>' +
+  //                                     querySvar[0].vegreferanse.kortform +
+  //                                     '</b>.</p><p>Vil du legge til denne vegreferansen eller søke på nytt?</p>'
+  //           modal.classList.remove('borte')
+  //           on.once(jaKnapp, 'click', function () {
+  //             document.querySelector('[name="vegreferanse"]').value = querySvar[0].vegreferanse.kortform
+  //             view.extent = vegrefView.extent
+  //             modal.classList.add('borte')
+  //             vegrefDiv.classList.remove('aapen')
+  //             vegrefDiv.style.cursor = 'default'
+  //             console.log(vegrefView)
+  //           })
+  //         } else if ((oReq.status === 404)) {
+  //           meldingTekst.innerHTML = '<p>Avstanden til nærmeste veg er for lang. Søk på nytt og klikk nærmere vegkroppen</p>'
+  //           modal.classList.remove('borte')
+  //           jaKnapp.classList.add('borte')
+  //         }
+  //       }
+  //       oReq.send()
+  //     }
+  //   })
+  //   // vegrefDiv.style.cursor = "crosshair"
+  //   // Ajax-kall for å hente inn vegrefDiv
+  // })
+
+  // lukkRefKnapp.addEventListener('click', function () {
+  //   vegrefDiv.classList.remove('aapen')
+  // })
 
   document.getElementById('sendinn').addEventListener('click', function () {
     if (view.graphics.length > 0 && skjemaValidering()) {
@@ -380,11 +413,11 @@ require([
         } else {
           grafikkArray = [grafikk.items[0]]
         }
-        oppdaterFeatureLayer(skjemaItems, grafikk.items[0], linje)
+        // oppdaterFeatureLayer(skjemaItems, grafikk.items[0], linje)
 
       //  Hvis registrert grafikk er polygon, gjør noe annen logikk
       } else if (grafikk.items[0].symbol.type === 'simple-fill') {
-        oppdaterFeatureLayer(skjemaItems, grafikk.items[0], flate)
+        // oppdaterFeatureLayer(skjemaItems, grafikk.items[0], flate)
       }
 
       //  Fjern aktiv, åpen og andre markør-klasser

@@ -38,15 +38,15 @@ function testSkjemadrit (element) {
   }
 }
 
-prosjekt.addEventListener('click', function () {
-  fjernCss()
-  this.classList.add('active')
-  this.nextElementSibling.classList.add('aapen')
-})
+// prosjekt.addEventListener('click', function () {
+//   fjernCss()
+//   this.classList.add('active')
+//   this.nextElementSibling.classList.add('aapen')
+// })
 
-vegref.addEventListener('click', function () {
-  vegrefDiv.classList.add('aapen')
-})
+// vegref.addEventListener('click', function () {
+//   vegrefDiv.classList.add('aapen')
+// })
 
 Array.prototype.map.call(skjemaItems, function (obj) {
   obj.addEventListener('focusout', function () {
@@ -54,20 +54,20 @@ Array.prototype.map.call(skjemaItems, function (obj) {
   })
 })
 
-kart.addEventListener('click', function () {
-  if (skjemaValidering()) {
-    formMessage.innerHTML = ''
-    fjernCss()
-    this.classList.add('active')
-    this.nextElementSibling.classList.add('aapen')
-    window.scrollTo(0, 191)
-  } else {
-    Array.prototype.map.call(skjemaItems, function (obj) {
-      testSkjemadrit(obj)
-    })
-    formMessage.innerHTML = '<p>Skjemaet er ikke godkjent, fyll det ut riktig før du kan stedfeste prosjektet.</p>'
-  }
-})
+// kart.addEventListener('click', function () {
+//   if (skjemaValidering()) {
+//     formMessage.innerHTML = ''
+//     fjernCss()
+//     this.classList.add('active')
+//     this.nextElementSibling.classList.add('aapen')
+//     window.scrollTo(0, 191)
+//   } else {
+//     Array.prototype.map.call(skjemaItems, function (obj) {
+//       testSkjemadrit(obj)
+//     })
+//     formMessage.innerHTML = '<p>Skjemaet er ikke godkjent, fyll det ut riktig før du kan stedfeste prosjektet.</p>'
+//   }
+// })
 
 nyttProsjekt.addEventListener('click', function () {
   fjernCss()

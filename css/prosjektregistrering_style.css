@@ -200,6 +200,22 @@ small{
     transition: all 0.5s;
 }
 
+textarea {
+   width: 100%;
+   font-family: 'Rambla', sans-serif;
+   border-radius: 5px;
+   resize: none;
+}
+
+#toppViewDiv{
+  height: 60vh;
+  width: 100%;
+  border-radius: 5px;
+  /* max-height: 0; */
+  transition: all 0.3s;
+  margin-bottom: 30px;
+}
+
 #vegrefWrapper{
   position: relative;
   flex: 0 1 70%;
@@ -279,6 +295,10 @@ small{
     font-size: 16px;
     margin-top: 30px;
     margin-bottom: 30px;
+}
+
+[name="toppregistrering"] {
+  max-height: 0;
 }
 
 #vegrefDiv{
@@ -368,7 +388,7 @@ small{
 }
 /* TODO: Fjern denne her etter jeg har funnet en god løsning på display:none transition */
 .borte{
-  display: none;
+  display: none !important;
 }
 
 .aktiv {
@@ -378,6 +398,10 @@ small{
 
 .aktiv svg{
   stroke:white !important;
+}
+
+.halv-aapen{
+  max-height: 20vh !important;
 }
 
 @media only screen and (max-width: 600px) {
