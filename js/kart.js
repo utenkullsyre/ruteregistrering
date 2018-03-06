@@ -251,6 +251,7 @@ require([
   })
 
   view.when(function () {
+    console.log(view);
     var velgnytopp = document.querySelector('[name="velgnytopp"]')
     var velgtopp = document.querySelector('[name="velgtopp"]')
     var baseToggle = document.querySelector('#baseToggle')
