@@ -316,31 +316,6 @@ require([
     function toggleUi(view){
 
     }
-    on(velgnytopp, 'click', function () {
-      view.goTo({
-        target: event.mapPoint
-      }).then(resetKart(view))
-    });
-    on(velgtopp, 'click', function() {
-      toppinfoKnapp.classList.remove('active')
-      toppinfoDiv.classList.remove('aapen')
-      parkeringinfoDiv.classList.add('aapen')
-      parkeringinfoKnapp.classList.add('active')
-      view.container = parkeringkartDiv
-      topp.visible = false;
-      parkering.visible = true;
-      parkeringkartDiv.classList.remove('borte')
-    })
-    on(nytoppknapp, 'click', function (event) {
-      nyTopp(view)
-      stateHandler = 'nyTopp'
-      console.log(stateHandler);
-    })
-    on(registrerTopp, 'click', function(event) {
-      resetKart(view, event.mapPoint);
-      topp.opacity = 1;
-      topp.definitionExpression = ''
-    })
     on(sokinput, 'key-up', function () {
       alert('dfghdfghdfgh')
       document.querySelector('#sokResultat').classList.remove('borte')
@@ -354,10 +329,14 @@ require([
       .then(function(response){
         hittest = response
         if (response.results.length > 0 && stateHandler === 'default') {
-          var resultat = response.results[0];
+          var resultat = response.results[0].graphic.attributes;
           event.stopPropagation();
-          console.log(response.results[0]);
-          topp.definitionExpression = 'OBJECTID = ' + resultat.graphic.attributes.OBJECTID
+          // var merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merkand"
+          vmValgResultat.valgttopp.navn = resultat.navn,
+          vmValgResultat.valgttopp.hoyde = resultat.hoyde,
+          vmValgResultat.valgttopp.beskrivelse = resultat.beskrivelse,
+          vmValgResultat.valgttopp.merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merknad"
+          topp.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
           view.ui.container.classList.add('borte')
           uiComponents.classList.add('borte')
           console.log(uiComponents.classList);
@@ -366,9 +345,6 @@ require([
           })
           valgtToppInfo.classList.remove('borte')
           viewDivTest.classList.add('halv-aapen')
-
-
-
         } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
           console.log('Statehandler = ' + stateHandler);
           // leggTilPkt(event.mapPoint)
@@ -376,7 +352,62 @@ require([
           view.container.classList.add('borte')
           view.container = null
         }
+      }).otherwise(function(error){
+        console.log(error);
       })
+    })
+
+    on(nytoppknapp, 'click', function (event) {
+      nyTopp(view)
+      stateHandler = 'nyTopp'
+      console.log(stateHandler);
+    })
+
+    var vmValgResultat = new Vue({
+      el: '#valgtFjelltopp',
+      data: {
+        valgttopp: {
+          navn: '',
+          hoyde: null ,
+          beskrivelse: '',
+          merknad: 'Ingen registrerte merknader'
+        }
+      },
+      methods: {
+        velgnytopp: function () {
+          this.resetValgtTopp();
+          resetKart(view);
+
+          view.goTo({
+            target: event.mapPoint
+          }).then(function(){
+            view.focus()
+          })
+        },
+        velgtopp: function () {
+          toppinfoKnapp.classList.remove('active')
+          toppinfoDiv.classList.remove('aapen')
+          parkeringinfoDiv.classList.add('aapen')
+          parkeringinfoKnapp.classList.add('active')
+          view.container = parkeringkartDiv
+          topp.visible = false;
+          parkering.visible = true;
+          parkeringkartDiv.classList.remove('borte')
+        },
+        registrerTopp: function(event) {
+          resetKart(view, event.mapPoint);
+          topp.opacity = 1;
+          topp.definitionExpression = ''
+        },
+        resetValgtTopp: function(){
+          this.valgttopp = {
+            navn: '',
+            hoyde: null ,
+            beskrivelse: '',
+            merknad: 'Ingen registrerte merknader'
+          }
+        }
+      }
     })
      // baseToggle.classList.remove('hide')
     // bilder.load().then(function () {
