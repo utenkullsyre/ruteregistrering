@@ -388,6 +388,17 @@ require([
       console.log(stateHandler);
     })
 
+    // var vmToppReg = new Vue({
+    //   el: '#toppregistrering',
+    //   data: {
+    //   },
+    //   methods: {
+    //     registrerFF: function () {
+    //
+    //     }
+    //   }
+    // })
+
     var vmValgResultat = new Vue({
       el: '#valgtFjelltopp',
       data: {
