@@ -167,6 +167,7 @@ button.accordion.active:after {
   text-align: center;
   text-decoration: none;
   font-size: 16px;
+  width: 193px;
 }
 
 .knapperad {
@@ -191,6 +192,10 @@ h3{
 
 .aapen{
   max-height: 1500px !important;
+}
+
+.lukket{
+  max-height: 0px !important;
 }
 
 .formitem{
