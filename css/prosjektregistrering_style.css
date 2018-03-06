@@ -209,6 +209,7 @@ h3{
 .formitem label{
   flex: 0 1 30%;
   font-weight: bold;
+  margin: 15px 0;
 }
 
 small{
@@ -216,10 +217,10 @@ small{
   margin-left: auto;
 }
 
-.formitem input[type=text], .formitem input[type=name], .formitem input[type=email], .formitem select {
+.formitem input[type=text], .formitem input[type=name], .formitem input[type=email], .formitem select, .formitem input[type=number]{
     padding: 12px 20px;
     margin: 8px 0;
-    background-color: #ede0ca;
+    background-color: #afd7f6;
     display: inline-block;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -230,10 +231,12 @@ small{
 }
 
 textarea {
-   width: 100%;
    font-family: 'Rambla', sans-serif;
+   font-size: 1em;
+   padding: 10px;
    border-radius: 5px;
    resize: none;
+   flex: 0 1 auto;
 }
 
 #toppViewDiv, #parkeringViewDiv{
@@ -307,7 +310,7 @@ textarea {
   border: 2px solid red!important;
 }
 
-#dato input{
+/* #dato input{
   padding: 12px 20px;
   margin: 8px 0;
   background-color: #ede0ca;
@@ -316,7 +319,7 @@ textarea {
   border-radius: 4px;
   box-sizing: border-box;
   font-size: 1.1rem;
-}
+} */
 
 #dato [name="mnd"]{
   width: 100px;
@@ -362,6 +365,8 @@ textarea {
 
 [name="toppregistrering"] {
   max-height: 0;
+  border-left: 5px #1E699C solid;
+  padding: 0 20px;
 }
 
 #vegrefDiv{
@@ -526,6 +531,10 @@ textarea {
     transform: scale(.6, .6);
     bottom:-14px;
     left: -14px
+  }
+
+  textarea{
+    width: 95%;
   }
 
 }

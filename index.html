@@ -56,11 +56,16 @@
 
           <div class="formitem">
             <label for="merknad">Merknad</label>
-            <textarea  name="merknad" placeholder="Skriv inn en merknad av turen om det finnes noen" rows="8" cols="80"></textarea>
+            <textarea  name="merknad" placeholder="Skriv inn en merknad av turen om det finnes noen" rows="4" cols="80"></textarea>
           </div>
 
           <div id="valideringForm" class="message">
           </div>
+
+          <div class="knapperad">
+            <button type="button" class="knapp" name="registrerFjelltopp" @click="registrerFjelltopp">Registrer fjelltopp</button>
+          </div>
+
         </form>
 
         <div id="valgtFjelltopp" name="valgt-topp-info">

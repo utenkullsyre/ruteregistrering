@@ -19,6 +19,7 @@ require([
   'esri/widgets/Locate',
   'esri/widgets/Search',
   'esri/Graphic',
+  'esri/layers/GraphicsLayer',
   'esri/widgets/Sketch/SketchViewModel',
   'esri/layers/ElevationLayer',
   'esri/Ground',
@@ -28,7 +29,7 @@ require([
 ], function (
   Map, MapView, Basemap, TileLayer,
   FeatureLayer, Extent, SpatialReference,
-  LayerList, Locate, Search, Graphic, SketchViewModel,
+  LayerList, Locate, Search, Graphic, GraphicsLayer, SketchViewModel,
   ElevationLayer, Ground, on, dom
 ) {
   /************************************************************
@@ -66,6 +67,11 @@ require([
     visible: false
   })
 
+  var grafikkLag = new GraphicsLayer({
+    visible: true,
+    id: 'Grafikklag'
+  })
+
   var baseMap = new Basemap({
     baseLayers: [graatone, bilder],
     title: 'NVDB',
@@ -75,7 +81,7 @@ require([
    // Create a Map instance
   var map = new Map({
     basemap: baseMap,
-    layers: [topp, parkering]
+    layers: [topp, parkering, grafikkLag]
   })
 
   var stateHandler = 'default';
@@ -258,6 +264,7 @@ require([
     var img = document.querySelectorAll('#baseToggle img')
     var nytoppknapp = document.querySelector('#nyTopp')
     var toppinfoDiv = document.querySelector('#toppinfo')
+    var toppFormDiv = document.querySelector('[name= "toppregistrering"]')
     var toppinfoKnapp = document.querySelector('#toppdetaljer')
     var parkeringinfoDiv = document.querySelector('#parkeringinfo')
     var parkeringinfoKnapp = document.querySelector('#parkeringregistrering')
@@ -289,6 +296,7 @@ require([
       console.log('Kart resett');
     }
     function nyTopp(view){
+      grafikkLag.removeAll();
       topp.opacity = 0.3;
       view.cursor = 'crosshair'
     }
@@ -296,22 +304,28 @@ require([
       var point = {
         type: "point",  // autocasts as new Point()
         x: kartpkt.x,
-        y: kartpkt.y
+        y: kartpkt.y,
+        spatialReference: {
+          wkid: 25833
+        }
       };
 
       // Create a symbol for drawing the point
       var markerSymbol = {
-        type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
-        size: 50,
-        color: [226, 119, 40]
+          type: "simple-marker",
+          outline: {
+              width: 1.5,
+              color: [255, 0, 0, 1]
+          },
+          size: 14,
+          color: [255, 170, 0, 0.36]
       };
+
       var grafikk = new Graphic({
         geometry: point,
         symbol: markerSymbol
       })
-      view.graphics.add(grafikk)
-      console.log("test", grafikk);
-      console.log(view.graphics);
+      return grafikk
     }
     function toggleUi(view){
 
@@ -347,7 +361,18 @@ require([
           viewDivTest.classList.add('halv-aapen')
         } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
           console.log('Statehandler = ' + stateHandler);
-          // leggTilPkt(event.mapPoint)
+          var grafikk = leggTilPkt(event.mapPoint)
+          grafikkLag.graphics.add(grafikk)
+          view.goTo({
+            target: grafikk
+          })
+          .then(function(response){
+            viewDivTest.classList.add('halv-aapen')
+            view.ui.container.classList.add('borte')
+            toppFormDiv.classList.remove('borte')
+            toppFormDiv.classList.add('aapen')
+
+          })
         } else {
           view.container.classList.add('borte')
           view.container = null
