@@ -6,7 +6,7 @@ body{
   font-family: "Raleway",sans-serif;
   color: #2E3539;
   min-height: 100vh;
-  background-image: url("../img/bakgrunn_blur4.jpg");
+  background-image: url("../img/bkgr.png");
   background-repeat: no-repeat;
   background-attachment: fixed;
   -webkit-background-size: cover;
