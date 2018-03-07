@@ -264,6 +264,7 @@ require([
     var img = document.querySelectorAll('#baseToggle img')
     var nytoppknapp = document.querySelector('#nyTopp')
     var toppinfoDiv = document.querySelector('#toppinfo')
+    var formFjellWrapper = document.querySelector('#fjelltopFormWrapper')
     var toppFormDiv = document.querySelector('[name= "toppregistrering"]')
     var toppinfoKnapp = document.querySelector('#toppdetaljer')
     var parkeringinfoDiv = document.querySelector('#parkeringinfo')
@@ -274,7 +275,7 @@ require([
     var viewDivTest = document.querySelector('#toppViewDiv');
     var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]');
     var nytoppknapp = document.querySelector('#nyTopp');
-    var uiComponents = document.querySelector('.map-ui-component');
+    var uiComponents = document.querySelector('#toppViewDiv > div.map-ui-component');
     var sokinput = document.querySelector('.map-ui-component input[type=text]')
     console.log(sokinput);
 
@@ -286,13 +287,20 @@ require([
             console.log(obj);
           })
 
+    view.cursor = 'pointer'
+
     function resetKart(view){
+      stateHandler = 'default'
+      grafikkLag.removeAll();
       var fetthaal = view.ui.container
       fetthaal.classList.remove('borte');
-      uiComponents.classList.remove('borte')
+      uiComponents.classList.remove('borte');
       view.container.classList.remove('halv-aapen');
-      valgtToppInfo.classList.add('borte')
-      topp.definitionExpression = null
+      valgtToppInfo.classList.add('borte');
+      topp.definitionExpression = null;
+      topp.opacity = 1;
+      topp.visible = true
+      view.cursor = 'pointer'
       console.log('Kart resett');
     }
     function nyTopp(view){
@@ -310,15 +318,12 @@ require([
         }
       };
 
-      // Create a symbol for drawing the point
+      // autocasts as new PictureMarkerSymbol()
       var markerSymbol = {
-          type: "simple-marker",
-          outline: {
-              width: 1.5,
-              color: [255, 0, 0, 1]
-          },
-          size: 14,
-          color: [255, 170, 0, 0.36]
+          type: "picture-marker",
+          url: "./img/mountain.png",
+          width: 26,
+          height: 26
       };
 
       var grafikk = new Graphic({
@@ -327,8 +332,21 @@ require([
       })
       return grafikk
     }
-    function toggleUi(view){
+    function toggleUi(view, tilstand){
+      if (tilstand === 'on') {
+        stateHandler = 'default'
+        grafikkLag.removeAll();
+        var fetthaal = view.ui.container
+        fetthaal.classList.remove('borte');
+        uiComponents.classList.remove('borte');
+        topp.definitionExpression = null;
+        topp.opacity = 1;
 
+      } else if (tilstand === 'off') {
+        uiComponents.classList.add('borte')
+        viewDivTest.classList.add('halv-aapen')
+        view.ui.container.classList.add('borte')
+      }
     }
     on(sokinput, 'key-up', function () {
       alert('dfghdfghdfgh')
@@ -361,21 +379,27 @@ require([
           viewDivTest.classList.add('halv-aapen')
         } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
           console.log('Statehandler = ' + stateHandler);
+          grafikkLag.removeAll();
           var grafikk = leggTilPkt(event.mapPoint)
+          vmToppReg.lagretGrafikk = true;
           grafikkLag.graphics.add(grafikk)
           view.goTo({
             target: grafikk
           })
           .then(function(response){
             viewDivTest.classList.add('halv-aapen')
-            view.ui.container.classList.add('borte')
-            toppFormDiv.classList.remove('borte')
-            toppFormDiv.classList.add('aapen')
+            toggleUi(view, 'off')
+            formFjellWrapper.classList.remove('borte')
+            formFjellWrapper.classList.add('aapen')
+            topp.opacity = 1
+            topp.visible = false
+            console.log(view);
+
 
           })
         } else {
-          view.container.classList.add('borte')
-          view.container = null
+          // view.container.classList.add('borte')
+          // view.container = null
         }
       }).otherwise(function(error){
         console.log(error);
@@ -388,16 +412,21 @@ require([
       console.log(stateHandler);
     })
 
-    // var vmToppReg = new Vue({
-    //   el: '#toppregistrering',
-    //   data: {
-    //   },
-    //   methods: {
-    //     registrerFF: function () {
-    //
-    //     }
-    //   }
-    // })
+    var vmToppReg = new Vue({
+      el: '#fjelltopFormWrapper',
+      data: {
+        lagretGrafikk: false
+      },
+      methods: {
+        resetkart: function () {
+          resetKart(view);
+          this.lagretGrafikk = false;
+        }
+        // registrerFF: function () {
+        //
+        // }
+      }
+    })
 
     var vmValgResultat = new Vue({
       el: '#valgtFjelltopp',

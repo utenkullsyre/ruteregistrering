@@ -170,6 +170,10 @@ button.accordion.active:after {
   width: 193px;
 }
 
+.knapp:hover{
+  background-color: #a0cdec;
+}
+
 .knapperad {
   margin-bottom: 15px;
   display: flex;
@@ -237,6 +241,7 @@ textarea {
    border-radius: 5px;
    resize: none;
    flex: 0 1 auto;
+   background-color: #afd9f6
 }
 
 #toppViewDiv, #parkeringViewDiv{
@@ -364,7 +369,6 @@ textarea {
 }
 
 [name="toppregistrering"] {
-  max-height: 0;
   border-left: 5px #1E699C solid;
   padding: 0 20px;
 }
