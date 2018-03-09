@@ -107,20 +107,6 @@ function leggTilSegment(segmentListe){
   esriRequest(url, options)
   .then(function(response) {
     console.log('response', response);
-    // var polyline = new Graphic({
-    //   geometry: {
-    //     type: 'polyline',
-    //     paths: response.data.geometries[0].paths,
-    //     spatialReference: {
-    //       wkid: 25833
-    //     }
-    //   },
-    //   symbol: polylineSymbol
-    // })
-    // view.graphics.add(polyline)
-    // view.goTo({
-    //   target: polyline
-    // })
 
   })
   .otherwise(function (error) {

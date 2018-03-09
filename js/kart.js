@@ -10,7 +10,9 @@ var lag = {}
 require([
   'esri/Map',
   'esri/views/MapView',
+  'esri/Viewpoint',
   'esri/Basemap',
+  'esri/geometry/Point',
   'esri/layers/TileLayer',
   'esri/layers/FeatureLayer',
   'esri/geometry/Extent',
@@ -23,23 +25,23 @@ require([
   'esri/widgets/Sketch/SketchViewModel',
   'esri/layers/ElevationLayer',
   'esri/Ground',
+  'esri/request',
+  'esri/config',
   'dojo/on',
   'dojo/dom',
   'dojo/domReady!'
+
 ], function (
-  Map, MapView, Basemap, TileLayer,
+  Map, MapView, Viewpoint, Basemap, Point, TileLayer,
   FeatureLayer, Extent, SpatialReference,
   LayerList, Locate, Search, Graphic, GraphicsLayer, SketchViewModel,
-  ElevationLayer, Ground, on, dom
+  ElevationLayer, Ground, esriRequest, esriConfig, on, dom
 ) {
-  /************************************************************
-   * Creates a new WebMap instance. A WebMap must reference
-   * a PortalItem ID that represents a WebMap saved to
-   * arcgis.com or an on-premise portal.
-   *
-   * To load a WebMap from an on-premise portal, set the portal
-   * url with esriConfig.portalUrl.
-   ************************************************************/
+  esriConfig.request.corsEnabledServers.push("www.norgeskart.no");
+  esriConfig.request.corsEnabledServers.push("ws.geonorge.no");
+  esriConfig.request.corsEnabledServers.push("api.nve.no");
+
+
   var graatone = new TileLayer({
     url: 'https://services.geodataonline.no/arcgis/rest/services/Geocache_UTM33_EUREF89/GeocacheGraatone/MapServer',
     id: 'Gråtone',
@@ -117,6 +119,14 @@ require([
   var searchWidget = new Search({
     view: view
   })
+
+  var sokSymbol = {
+    type: "simple-marker",
+    outline: {
+        width: 2.75,
+        color: [255, 0, 0, 0.72]
+      }
+  };
 
   var freehandIcon = document.querySelector('#freehandButton')
   var undoIcon = document.querySelector('#undoButton')
@@ -255,6 +265,52 @@ require([
   // This function is called when the promise is rejected
     console.error(error)  // Logs the error message
   })
+
+  function stedsSok (evt) {
+    if(evt.target.value.length>0){
+      var url = "https://ws.geonorge.no/SKWS3Index/v2/ssr/sok?"
+      if(evt.target.value.split(",")[1]){
+        var inputNavn = evt.target.value.split(",")[0];
+        var inputEkstra = evt.target.value.split(",")[1];
+      } else {
+        var inputNavn = evt.target.value;
+        var inputEkstra = "";
+      }
+      var options = {
+          query: {
+            navn: inputNavn + "*",
+            fylkeKommuneNavnListe: inputEkstra,
+            eksakteForst:true,
+            antPerSide:15,
+            epsgKode:25833,
+          },
+          responseType: 'xml'
+        };
+        return esriRequest(url, options)
+        // .then(function(response) {
+        //   var resultat = []
+        //   Array.prototype.map.call(response.data.childNodes["0"].childNodes,function(obj){
+        //     if (obj.localName === "stedsnavn"){
+        //       el = obj
+        //       console.log(el);
+        //       var stedsnavnObjekt = {}
+        //       stedsnavnObjekt.navn = obj.childNodes[4].innerHTML;
+        //       stedsnavnObjekt.type = obj.childNodes[1].innerHTML.toLowerCase();
+        //       stedsnavnObjekt.kommune = obj.childNodes[2].innerHTML;
+        //       stedsnavnObjekt.fylke = obj.childNodes[3].innerHTML;
+        //       stedsnavnObjekt.x = obj.childNodes[5].innerHTML;
+        //       stedsnavnObjekt.y = obj.childNodes[6].innerHTML;
+        //       stedsnavnObjekt.epsg = obj.childNodes[10].innerHTML;
+        //       stedsnavnObjekt.stedsnr = obj.childNodes[11].innerHTML;
+        //       resultat.push(stedsnavnObjekt)
+        //     }
+        //   })
+        //   // TODO: Bytt ut denne blokka med ternary operator
+        //   vmInfoBoard.resultatSynlig = true;
+        //   vmInfoBoard.resultat = resultat;
+        //   vmInfoBoard.stedsNavn = evt.target.value;
+        // })
+    }}
 
   view.when(function () {
     console.log(view);
@@ -410,6 +466,126 @@ require([
       nyTopp(view)
       stateHandler = 'nyTopp'
       console.log(stateHandler);
+    })
+
+    var vmInfoBoard = new Vue({
+      el: '#sokInfo',
+      data: {
+        sokSynlig: false,
+        infoboksSynlig: false,
+        lasteSymbol: false,
+        stedsNavn: '',
+        hoyde: '....',
+        vaerUrl: '',
+        solUrl: '',
+        snackbarSynlig: false,
+        snackTitle: 'Tittel',
+        snackMessage: 'Snackmelding her',
+        antObjekter: 0,
+        resultatSynlig: false,
+        resultat: []
+      },
+      methods: {
+        lukkInfo: function () {
+          this.infoboksSynlig = false;
+          this.stedsNavn = '';
+          this.hoyde = '....';
+        },
+        stedSok: function (evt) {
+          if(evt.target.value.length>0){
+            var url = "https://ws.geonorge.no/SKWS3Index/v2/ssr/sok?"
+            if(evt.target.value.split(",")[1]){
+              var inputNavn = evt.target.value.split(",")[0];
+              var inputEkstra = evt.target.value.split(",")[1];
+            } else {
+              var inputNavn = evt.target.value;
+              var inputEkstra = "";
+            }
+            var options = {
+                query: {
+                  navn: inputNavn + "*",
+                  fylkeKommuneNavnListe: inputEkstra,
+                  eksakteForst:true,
+                  antPerSide:15,
+                  epsgKode:25833,
+                },
+                responseType: 'xml'
+              };
+              console.log(options);
+              esriRequest(url, options)
+              .then(function(response) {
+                var resultat = []
+                Array.prototype.map.call(response.data.childNodes["0"].childNodes,function(obj){
+                  if (obj.localName === "stedsnavn"){
+                    el = obj
+                    console.log(el);
+                    var stedsnavnObjekt = {}
+                    stedsnavnObjekt.navn = obj.childNodes[4].innerHTML;
+                    stedsnavnObjekt.type = obj.childNodes[1].innerHTML.toLowerCase();
+                    stedsnavnObjekt.kommune = obj.childNodes[2].innerHTML;
+                    stedsnavnObjekt.fylke = obj.childNodes[3].innerHTML;
+                    stedsnavnObjekt.x = obj.childNodes[5].innerHTML;
+                    stedsnavnObjekt.y = obj.childNodes[6].innerHTML;
+                    stedsnavnObjekt.epsg = obj.childNodes[10].innerHTML;
+                    stedsnavnObjekt.stedsnr = obj.childNodes[11].innerHTML;
+                    resultat.push(stedsnavnObjekt)
+                  }
+                })
+                // TODO: Bytt ut denne blokka med ternary operator
+                vmInfoBoard.resultatSynlig = true;
+                vmInfoBoard.resultat = resultat;
+                vmInfoBoard.stedsNavn = evt.target.value;
+              })
+              .otherwise(function (error) {
+                console.log(error);
+              })
+
+          }
+        },
+        slaaOppSted: function(evt){
+          vmInfoBoard.stedsNavn = evt.target.innerHTML;
+
+          console.log(vmInfoBoard);
+          var pos = {
+            x: parseInt(evt.target.attributes["data-x"].value),
+            y: parseInt(evt.target.attributes["data-y"].value)
+          }
+
+          // console.log("Point", pos);
+
+          var grafikk = new Graphic({
+            geometry: new Point({
+                x: pos.x,
+                y: pos.y,
+                spatialReference: {
+                  wkid: 25833
+                }
+              }),
+            symbol: sokSymbol
+          })
+          view.graphics.removeAll()
+          view.graphics.add(grafikk)
+          var viewpoint = new Viewpoint({
+            targetGeometry: grafikk.geometry,
+            scale: 30000,
+            heading: 20,
+            tilt: 50
+          })
+
+          var options = {
+            easing: "in-out-cubic",
+          }
+          view.goTo(viewpoint, options)
+          vmInfoBoard.resultat = [];
+          vmInfoBoard.stedsNavn = null
+
+        },
+        lukkSok: function() {
+          this.resultatSynlig = false;
+          this.resultat = [];
+          this.stedsNavn = '';
+        }
+      }
     })
 
     var vmToppReg = new Vue({

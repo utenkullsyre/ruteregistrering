@@ -28,10 +28,24 @@
         <!-- Kartet for registrering eller velging av topp -->
         <div id="toppViewDiv">
           <div class="map-ui-component">
-            <input type="text"  name="search" placeholder="Søk på stedsnavn">
-            <div id="sokResultat" class="borte">
-              <p>sdfgsd gsdfg sdfg sdfg sdfg sdfg sdfg sdfg sdf g</p>
+            <!-- Infoboks og stedsøk -->
+            <div id="sokInfo" >
+              <!-- Stedssøk input -->
+              <div id="search">
+                <input type="text" placeholder="Søk på stedsnavn" :value="stedsNavn" @keyup="stedSok">
+                <!-- <input type="text" placeholder="Søk på stedsnavn" :value="stedsNavn" @keyup="stedSok"> -->
+              </div>
+              <!-- Stedssøk resultat -->
+              <transition name="aapne">
+                <div id="searchResult" v-if="resultat[0]">
+                  <a href="javascript:void(0)" class="closebtn" @click="lukkSok">&times;</a>
+                  <ul>
+                    <li v-for="item in resultat" :data-x="item.x" :data-y="item.y" @click="slaaOppSted">{{ item.navn }}, {{ item.type }} i {{ item.kommune }}</li>
+                  </ul>
+                </div>
+              </transition>
             </div>
+            <!-- <input type="text"  name="search" placeholder="Søk på stedsnavn"> -->
           </div>
           <button class="action-button esri-icon-map-pin" id="nyTopp" type="button"></button>
         </div>
