@@ -422,14 +422,15 @@ require([
       var hittest = {}
       view.hitTest(event)
       .then(function(response){
+        console.log(response);
         hittest = response
         if (response.results.length > 0 && stateHandler === 'default') {
           var resultat = response.results[0].graphic.attributes;
           event.stopPropagation();
           // var merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merkand"
-          vmValgResultat.valgttopp.navn = resultat.navn,
+          vmValgResultat.valgttopp.navn = resultat.navn.length > 0 ? resultat.navn : "Ikke registrert navn",
           vmValgResultat.valgttopp.hoyde = resultat.hoyde,
-          vmValgResultat.valgttopp.beskrivelse = resultat.beskrivelse,
+          vmValgResultat.valgttopp.beskrivelse = resultat.beskrivelse.length > 0 ? resultat.beskrivelse : "Ikke registrert beskrivelse",
           vmValgResultat.valgttopp.merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merknad"
           topp.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
           view.ui.container.classList.add('borte')
@@ -633,6 +634,12 @@ require([
           hoyde: null ,
           beskrivelse: '',
           merknad: 'Ingen registrerte merknader'
+        },
+        valgtparkering: {
+          navn: '',
+          plasser: null ,
+          broytet: '',
+          merknad: 'Ingen registrerte merknader'
         }
       },
       methods: {
@@ -653,7 +660,7 @@ require([
           parkeringinfoDiv.classList.add('aapen')
           parkeringinfoKnapp.classList.add('active')
           resetKart(view)
-          parkeringinfoDiv.insertBefore(viewDivTest, document.querySelector('#parkeringinfo form'))
+          parkeringinfoDiv.insertBefore(viewDivTest, document.querySelector('#parkeringinfo .form-wrapper'))
           topp.visible = false;
           parkering.visible = true;
           regState = 'parkering'
