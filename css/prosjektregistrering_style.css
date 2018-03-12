@@ -145,7 +145,7 @@ a:hover{
 }
 
 .vegref-prompt{
-  max-height: 300px;
+  max-height: 250px;
   z-index: 11;
   color: black;
   flex:0 1 500px;
@@ -223,6 +223,7 @@ button.accordion.active:after {
   text-decoration: none;
   font-size: 16px;
   width: 193px;
+  transition: all 0.3s;
 }
 
 .knapp:hover{
