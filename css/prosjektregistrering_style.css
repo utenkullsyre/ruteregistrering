@@ -145,15 +145,18 @@ a:hover{
 }
 
 .vegref-prompt{
+  max-height: 300px;
   z-index: 11;
   color: black;
   flex:0 1 500px;
   background-color: white;
   padding: 15px;
-  margin: 5px;
+  margin: 20px 5px;
   display: flex;
   flex-flow: row wrap ;
-  justify-content: center
+  justify-content: center;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .vegref-prompt button{

@@ -142,6 +142,10 @@ require([
   view.ui.add('nyTopp', 'bottom-right')
   //  test = view;
 
+  document.querySelector('#kartmodal > div.dimmed').addEventListener('click', function(evt){
+    evt.target.parentElement.classList.add('borte')
+  })
+
   view.when(function (evt) {
  // create a new sketch view model
     var sketchViewModel = new SketchViewModel({
