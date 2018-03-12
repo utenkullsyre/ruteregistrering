@@ -27,6 +27,10 @@
         <p>I denne seksjonen kan du enten velge en eksisterende topp eller registrere en ny topp.</p>
         <!-- Kartet for registrering eller velging av topp -->
         <div id="toppViewDiv">
+          <!-- Loader -->
+          <div id="loader">
+            <img class="image roter-bilde" src="img\weather.png" alt="" width="120" height="120">
+          </div>
           <div class="map-ui-component">
             <!-- Infoboks og stedsøk -->
             <div id="sokInfo" >
@@ -47,7 +51,7 @@
             </div>
             <!-- <input type="text"  name="search" placeholder="Søk på stedsnavn"> -->
           </div>
-          <button class="action-button esri-icon-map-pin" id="nyTopp" type="button"></button>
+          <button class="action-button esri-icon-plus" id="nyTopp" type="button"></button>
         </div>
         <div id="fjelltopFormWrapper">
           <div  class="form-wrapper" v-if="lagretGrafikk">
@@ -84,7 +88,6 @@
             </div>
           </div>
         </div>
-
         <div id="valgtFjelltopp" name="valgt-topp-info">
           <div class="vue-wrapper" v-if="valgttopp.navn.length > 0">
             <div class="valg-resultat">
@@ -109,9 +112,6 @@
            <br/>Felter merket med * er obligatoriske
         </p>
         <!-- Kartet for registrering eller velging av parkering -->
-        <div id="parkeringViewDiv" class="borte">
-          <input type="text" class="map-ui-component" name="search" placeholder="Søk på stedsnavn">
-        </div>
         <form name="parkeringregistrering" class="borte">
           <h3>Parkeringformasjon</h3>
 

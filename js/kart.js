@@ -127,6 +127,8 @@ require([
         color: [255, 0, 0, 0.72]
       }
   };
+  //  Sate-handler for å registrere hvilken registrerings-nivå man er på
+  var regState = 'topp'
 
   var freehandIcon = document.querySelector('#freehandButton')
   var undoIcon = document.querySelector('#undoButton')
@@ -140,7 +142,7 @@ require([
   view.ui.add('nyTopp', 'bottom-right')
   //  test = view;
 
-  view.then(function (evt) {
+  view.when(function (evt) {
  // create a new sketch view model
     var sketchViewModel = new SketchViewModel({
       view: view,
@@ -313,6 +315,7 @@ require([
     }}
 
   view.when(function () {
+    fjernLoader();
     console.log(view);
     var velgnytopp = document.querySelector('[name="velgnytopp"]')
     var velgtopp = document.querySelector('[name="velgtopp"]')
@@ -354,14 +357,17 @@ require([
       view.container.classList.remove('halv-aapen');
       valgtToppInfo.classList.add('borte');
       topp.definitionExpression = null;
-      topp.opacity = 1;
+      view.layerViews.items.map(function(obj){
+        obj.layer.opacity = 1
+      })
       topp.visible = true
       view.cursor = 'pointer'
       console.log('Kart resett');
     }
-    function nyTopp(view){
+    function registreringsViz(view){
       grafikkLag.removeAll();
       topp.opacity = 0.3;
+      parkering.opacity = 0.3;
       view.cursor = 'crosshair'
     }
     function leggTilPkt(kartpkt){
@@ -378,8 +384,8 @@ require([
       var markerSymbol = {
           type: "picture-marker",
           url: "./img/mountain.png",
-          width: 26,
-          height: 26
+          width: 19.5,
+          height: 19.5
       };
 
       var grafikk = new Graphic({
@@ -388,6 +394,7 @@ require([
       })
       return grafikk
     }
+
     function toggleUi(view, tilstand){
       if (tilstand === 'on') {
         stateHandler = 'default'
@@ -463,9 +470,23 @@ require([
     })
 
     on(nytoppknapp, 'click', function (event) {
-      nyTopp(view)
-      stateHandler = 'nyTopp'
-      console.log(stateHandler);
+      console.log(view);
+      view.graphics.removeAll();
+      grafikkLag.graphics.removeAll();
+      registreringsViz(view)
+      // TODO: Gjør om denne til switch-logikk etterhvert
+      if (regState === 'topp') {
+        stateHandler = 'nyTopp'
+        console.log(stateHandler);
+      } else if (regState === 'parkering') {
+        console.log('Parkeringsregistrering')
+
+      } else if  (regState === 'rute') {
+
+      } else {
+        console.log('What!?=');
+      }
+
     })
 
     var vmInfoBoard = new Vue({
@@ -625,15 +646,17 @@ require([
             view.focus()
           })
         },
+        //  Bekrefter valgt topp og går videre til Parkeringsregistrering
         velgtopp: function () {
           toppinfoKnapp.classList.remove('active')
           toppinfoDiv.classList.remove('aapen')
           parkeringinfoDiv.classList.add('aapen')
           parkeringinfoKnapp.classList.add('active')
-          view.container = parkeringkartDiv
+          resetKart(view)
+          parkeringinfoDiv.insertBefore(viewDivTest, document.querySelector('#parkeringinfo form'))
           topp.visible = false;
           parkering.visible = true;
-          parkeringkartDiv.classList.remove('borte')
+          regState = 'parkering'
         },
         registrerTopp: function(event) {
           resetKart(view, event.mapPoint);
@@ -797,4 +820,20 @@ require([
   //  if(view.graphics)
   //  view.graphics.removeAll();
   })
+  function fjernLoader(){
+    //velg elementer
+    var viewDivTest = document.querySelector('#toppViewDiv');
+    var loader = document.querySelector('#loader')
+    var bilde = document.querySelector('#loader img')
+    //Fjern loader
+    setTimeout(function () {
+      loader.classList.toggle('gjemt');
+      bilde.classList.remove('roter-bilde')
+      bilde.classList.add('scale');
+      setTimeout(function () {
+        loader.classList.toggle('skjult');
+        viewDivTest.removeChild(loader);
+      }, 1000)
+    }, 2000)
+  }
 })
