@@ -40,6 +40,8 @@ require([
   esriConfig.request.corsEnabledServers.push("www.norgeskart.no");
   esriConfig.request.corsEnabledServers.push("ws.geonorge.no");
   esriConfig.request.corsEnabledServers.push("api.nve.no");
+  esriConfig.request.corsEnabledServers.push("www.vegvesen.no");
+
 
 
   var graatone = new TileLayer({
@@ -54,7 +56,7 @@ require([
   })
 
   var topp = new FeatureLayer({
-    id: 'topp',
+    id: 'fjell',
     portalItem: {
       id: "03ecdbb776314ca0b99388156da4cd41"
     },
@@ -69,6 +71,14 @@ require([
     visible: false
   })
 
+  var rute = new FeatureLayer({
+    id: 'rute',
+    portalItem: {
+      id: "b00c50e3181c48aa93b2087a6d4d586f"
+    },
+    visible: false
+  })
+
   var grafikkLag = new GraphicsLayer({
     visible: true,
     id: 'Grafikklag'
@@ -76,14 +86,15 @@ require([
 
   var baseMap = new Basemap({
     baseLayers: [graatone, bilder],
-    title: 'NVDB',
-    id: 'nvdb'
+    title: 'Bakgrunnskart',
+    id: 'bakgrunnskart'
   })
 
    // Create a Map instance
   var map = new Map({
     basemap: baseMap,
-    layers: [topp, parkering, grafikkLag]
+    //  Rekkefølgen i liste bestemmer hvordan de blir tegnet. Første første, siste sist.
+    layers: [rute, topp, parkering, grafikkLag]
   })
 
   var stateHandler = 'default';
@@ -139,7 +150,9 @@ require([
     view.extent = startVindu
   })
   view.ui.move('zoom', 'top-right')
-  view.ui.add('nyTopp', 'bottom-right')
+  view.ui.add('nyTopp', 'nyParkering', 'nyRute', 'bottom-right')
+  view.ui.add('nyParkering', 'bottom-right')
+  view.ui.add('nyRute', 'bottom-right')
   //  test = view;
 
   document.querySelector('#kartmodal > div.dimmed').addEventListener('click', function(evt){
@@ -383,7 +396,6 @@ require([
           wkid: 25833
         }
       };
-
       // autocasts as new PictureMarkerSymbol()
       var markerSymbol = {
           type: "picture-marker",
@@ -391,13 +403,44 @@ require([
           width: 19.5,
           height: 19.5
       };
-
       var grafikk = new Graphic({
         geometry: point,
         symbol: markerSymbol
       })
       return grafikk
     }
+
+
+  function skiftRegnivaa(registreringsnivaa){
+    //  Endre registreringsstatus
+    regState = registreringsnivaa
+    //  Loope gjennom alle 'panel' - objekt og skru av de som ikke har regtype === regstatus (bruker ternarny)'
+    // Array.prototype.map.call(document.querySelectorAll('.panel'), function(obj){
+    //   console.log(obj.dataset.regtype);
+    //   if(obj.dataset.regtype === registreringsnivaa){
+    //     obj.classList.remove('borte')
+    //   } else {
+    //     obj.classList.add('borte')
+    //   }
+    // })
+    //  Loope gjennom knapper i kart og skru av de som ikke stemmer med registreringsstatus
+    Array.prototype.map.call(document.querySelectorAll('.action-button'), function(obj){
+      if (obj.dataset.regtype === registreringsnivaa) {
+        obj.classList.remove('borte')
+      } else {
+        obj.classList.add('borte')
+      }
+    })
+    //  Loope gjennom kart og aktivere de
+    view.map.layers.items.map(function(obj){
+      console.log(obj);
+      if (obj.id === registreringsnivaa) {
+        obj.visible = true
+      } else {
+        obj.visible = false
+      }
+    })
+  }
 
     function toggleUi(view, tilstand){
       if (tilstand === 'on') {
@@ -415,6 +458,16 @@ require([
         view.ui.container.classList.add('borte')
       }
     }
+    view.container.addEventListener('keydown', function(evt){
+      if (evt.ctrlKey && evt.keyCode === 188) {
+        console.log("View",view);
+        view.map.layers.map(function(obj){
+          console.log(obj);
+          obj.visible = true
+        })
+      }
+    })
+
     on(sokinput, 'key-up', function () {
       alert('dfghdfghdfgh')
       document.querySelector('#sokResultat').classList.remove('borte')
@@ -449,6 +502,46 @@ require([
           console.log('Statehandler = ' + stateHandler);
           grafikkLag.removeAll();
           var grafikk = leggTilPkt(event.mapPoint)
+          vmToppReg.lagretGrafikk = true;
+          grafikkLag.graphics.add(grafikk)
+          view.goTo({
+            target: grafikk
+          })
+          .then(function(response){
+            viewDivTest.classList.add('halv-aapen')
+            toggleUi(view, 'off')
+            formFjellWrapper.classList.remove('borte')
+            formFjellWrapper.classList.add('aapen')
+            topp.opacity = 1
+            topp.visible = false
+            console.log(view);
+
+
+          })
+        } else if (response.results.length === 0 && stateHandler === 'nyParkering') {
+          console.log('Statehandler = ' + stateHandler);
+          grafikkLag.removeAll();
+          var grafikk = leggTilPkt(event.mapPoint)
+          vmToppReg.lagretGrafikk = true;
+          grafikkLag.graphics.add(grafikk)
+          view.goTo({
+            target: grafikk
+          })
+          .then(function(response){
+            viewDivTest.classList.add('halv-aapen')
+            toggleUi(view, 'off')
+            formFjellWrapper.classList.remove('borte')
+            formFjellWrapper.classList.add('aapen')
+            topp.opacity = 1
+            topp.visible = false
+            console.log(view);
+
+
+          })
+        } else if (response.results.length === 0 && stateHandler === 'nyRute') {
+          console.log('Statehandler = ' + stateHandler);
+          grafikkLag.removeAll();
+          // Legg til linjegrafikk
           vmToppReg.lagretGrafikk = true;
           grafikkLag.graphics.add(grafikk)
           view.goTo({
@@ -537,14 +630,12 @@ require([
                 },
                 responseType: 'xml'
               };
-              console.log(options);
               esriRequest(url, options)
               .then(function(response) {
                 var resultat = []
                 Array.prototype.map.call(response.data.childNodes["0"].childNodes,function(obj){
                   if (obj.localName === "stedsnavn"){
                     el = obj
-                    console.log(el);
                     var stedsnavnObjekt = {}
                     stedsnavnObjekt.navn = obj.childNodes[4].innerHTML;
                     stedsnavnObjekt.type = obj.childNodes[1].innerHTML.toLowerCase();

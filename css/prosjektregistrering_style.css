@@ -78,6 +78,22 @@ a:hover{
   opacity: 0!important;}
 }
 
+.inline-img{
+position: relative;
+top: 4px;
+}
+
+.kart-img{
+  position: relative;
+  height: 27px;
+  top: 2px;
+  left: -4px;
+}
+
+#parkeringregistrering img {
+  width: 30px;
+}
+
 #header{
   display: flex;
   color: white;
@@ -195,22 +211,13 @@ button.accordion {
     outline: none;
     font-size: 1.3em;
     transition: 0.4s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 button.accordion.active {
     background-color: #83b6d9;
-}
-
-button.accordion:after {
-    content: '\002B';
-    color: #777;
-    font-weight: bold;
-    float: right;
-    margin-left: 5px;
-}
-
-button.accordion.active:after {
-    content: "\2212";
 }
 
 .knapp{
@@ -524,7 +531,8 @@ textarea {
     border: none;
     color: black;
     -webkit-transition: all 0.5s;
-    transition: all 0.5s
+    transition: all 0.5s;
+    overflow: hidden
 }
 
 
