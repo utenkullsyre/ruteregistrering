@@ -21,7 +21,7 @@
         <span>?</span>
       </div>
       <!-- Fjelltoppseksjon -->
-      <button id="toppdetaljer" class="accordion active">Fjelltopp <img class="inline-img" src="img\mountain_smll.png" alt=""></button>
+      <button id="toppdetaljer" class="accordion active" data-regtype="fjell" >Fjelltopp <img class="inline-img" src="img\mountain_smll.png" alt=""></button>
       <div id="toppinfo" class="panel aapen" data-regtype="fjell">
         <h3>Toppinformasjon</h3>
         <!-- TODO: Legg til alternativ bakgrunnsfarge/element his bilde ikke kan lastes ned -->
@@ -33,7 +33,7 @@
             <img class="image roter-bilde" src="img\weather.svg" alt="" width="120" height="120">
           </div>
           <!-- TODO: Skriv om denne til et nytt klassenavn 'modal' -->
-          <div id="kartmodal" class="vegrefModal">
+          <div id="kartmodal" class="vegrefModal borte">
             <div class="dimmed"></div>
             <div class="vegref-prompt">
               <p>Informasjonsmodal som skal inneholde diverse innhold knyttet til registreringsprosessen. Må legge til lukkeikon og mange forskjellige elementer</p>
@@ -66,7 +66,7 @@
           </div>
           <button class="action-button " id="nyTopp" data-regtype="fjell" type="button"><img src="img\mountain_smll.png" class="kart-img" alt=""></button>
           <button class="action-button borte kart-img" id="nyParkering" data-regtype="parkering" type="button"><img src="img\parkering.png" class="kart-img" alt=""></button>
-          <button class="action-button borte kart-img" id="nyRute" data-regtype="rute" type="button"><img src="img\mountain_smll.png" class="kart-img" alt=""></button>
+          <button class="action-button borte kart-img" id="nyRute" data-regtype="rute" type="button"><img src="img\trail.png" class="kart-img" alt=""></button>
         </div>
         <div id="fjelltopFormWrapper">
           <div  class="form-wrapper" v-if="lagretGrafikk">
@@ -120,7 +120,7 @@
         </div>
       </div>
       <!-- Parkerings-seksjon -->
-      <button id="parkeringregistrering" class="accordion">Parkering <img class="inline-img" src="img\parkering.png" alt=""></button>
+      <button id="parkeringregistrering" class="accordion" data-regtype="parkering">Parkering <img class="inline-img" src="img\parkering.png" alt=""></button>
       <div id="parkeringinfo" class="panel" data-regtype="parkering" >
         <p>I denne seksjonen kan du enten velge en allerede registrert parkering eller registrere en ny parkering.
            <br/>Felter merket med * er obligatoriske
@@ -185,8 +185,8 @@
       </div>
 
       <!-- Registrer rute -->
-      <button id="parkeringregistrering" class="accordion">Rute <img class="inline-img" src="img\trail.png" alt=""></button>
-      <div id="parkeringinfo" class="panel" data-regtype="rute">
+      <button id="ruteregistrering" class="accordion" data-regtype="rute">Rute <img class="inline-img" src="img\trail.png" alt=""></button>
+      <div id="ruteginfo" class="panel" data-regtype="rute">
         <p>I denne seksjonen kan du enten velge en allerede registrert parkering eller registrere en ny parkering.
            <br/>Felter merket med * er obligatoriske
         </p>

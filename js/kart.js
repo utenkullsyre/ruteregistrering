@@ -150,7 +150,7 @@ require([
     view.extent = startVindu
   })
   view.ui.move('zoom', 'top-right')
-  view.ui.add('nyTopp', 'nyParkering', 'nyRute', 'bottom-right')
+  view.ui.add('nyTopp', 'bottom-right')
   view.ui.add('nyParkering', 'bottom-right')
   view.ui.add('nyRute', 'bottom-right')
   //  test = view;
@@ -412,17 +412,25 @@ require([
 
 
   function skiftRegnivaa(registreringsnivaa){
-    //  Endre registreringsstatus
-    regState = registreringsnivaa
+    //  Loope gjennom alle tittel-knapper og sette den riktige til aktiv
+    Array.prototype.map.call(document.querySelectorAll('.accordion'), function(obj){
+      console.log(obj.dataset.regtype);
+      if(obj.dataset.regtype === registreringsnivaa){
+        obj.classList.add('active')
+      } else {
+        obj.classList.remove('active')
+      }
+    })
     //  Loope gjennom alle 'panel' - objekt og skru av de som ikke har regtype === regstatus (bruker ternarny)'
-    // Array.prototype.map.call(document.querySelectorAll('.panel'), function(obj){
-    //   console.log(obj.dataset.regtype);
-    //   if(obj.dataset.regtype === registreringsnivaa){
-    //     obj.classList.remove('borte')
-    //   } else {
-    //     obj.classList.add('borte')
-    //   }
-    // })
+    Array.prototype.map.call(document.querySelectorAll('.panel'), function(obj){
+      console.log(obj.dataset.regtype);
+      if(obj.dataset.regtype === registreringsnivaa){
+        obj.classList.remove('borte')
+        obj.classList.add('aapen')
+      } else {
+        obj.classList.add('borte')
+      }
+    })
     //  Loope gjennom knapper i kart og skru av de som ikke stemmer med registreringsstatus
     Array.prototype.map.call(document.querySelectorAll('.action-button'), function(obj){
       if (obj.dataset.regtype === registreringsnivaa) {
@@ -482,22 +490,33 @@ require([
         console.log(response);
         hittest = response
         if (response.results.length > 0 && stateHandler === 'default') {
+          //  Fjern ui, halver karthøyde, stopp vanlig oppførsel og zoom til valgt pkt
           var resultat = response.results[0].graphic.attributes;
           event.stopPropagation();
-          // var merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merkand"
-          vmValgResultat.valgttopp.navn = resultat.navn.length > 0 ? resultat.navn : "Ikke registrert navn",
-          vmValgResultat.valgttopp.hoyde = resultat.hoyde,
-          vmValgResultat.valgttopp.beskrivelse = resultat.beskrivelse.length > 0 ? resultat.beskrivelse : "Ikke registrert beskrivelse",
-          vmValgResultat.valgttopp.merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merknad"
-          topp.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
           view.ui.container.classList.add('borte')
           uiComponents.classList.add('borte')
           console.log(uiComponents.classList);
           view.goTo({
             target: event.mapPoint
           })
-          valgtToppInfo.classList.remove('borte')
           viewDivTest.classList.add('halv-aapen')
+          //  Hvis friluftstype er lik fjell, oppdater vue info for fjell-info
+          if (resultat.friluftstype === 'topp') {
+            vmValgResultat.valgttopp.navn = resultat.navn.length > 0 ? resultat.navn : "Ikke registrert navn",
+            vmValgResultat.valgttopp.hoyde = resultat.hoyde,
+            vmValgResultat.valgttopp.beskrivelse = resultat.beskrivelse.length > 0 ? resultat.beskrivelse : "Ikke registrert beskrivelse",
+            vmValgResultat.valgttopp.merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merknad"
+            topp.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
+            valgtToppInfo.classList.remove('borte')
+
+          }
+          //  Hvis friluftstype er lik parkering oppdater vue infor for parkering-info
+          } else if (resultat.friluftstype === 'parkering') {
+
+          //  Hvis ingen av de ovenfor matcher, gjør dette
+          } else {
+
+
         } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
           console.log('Statehandler = ' + stateHandler);
           grafikkLag.removeAll();
@@ -741,7 +760,6 @@ require([
         velgnytopp: function () {
           this.resetValgtTopp();
           resetKart(view);
-
           view.goTo({
             target: event.mapPoint
           }).then(function(){
@@ -750,15 +768,17 @@ require([
         },
         //  Bekrefter valgt topp og går videre til Parkeringsregistrering
         velgtopp: function () {
-          toppinfoKnapp.classList.remove('active')
-          toppinfoDiv.classList.remove('aapen')
-          parkeringinfoDiv.classList.add('aapen')
-          parkeringinfoKnapp.classList.add('active')
+          // toppinfoKnapp.classList.remove('active')
+          // toppinfoDiv.classList.remove('aapen')
+          // parkeringinfoDiv.classList.add('aapen')
+          // parkeringinfoKnapp.classList.add('active')
+          regState = 'parkering'
           resetKart(view)
           parkeringinfoDiv.insertBefore(viewDivTest, document.querySelector('#parkeringinfo .form-wrapper'))
-          topp.visible = false;
-          parkering.visible = true;
-          regState = 'parkering'
+          skiftRegnivaa(regState)
+          // topp.visible = false;
+          // parkering.visible = true;
+
         },
         registrerTopp: function(event) {
           resetKart(view, event.mapPoint);
