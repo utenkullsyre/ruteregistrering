@@ -23,6 +23,7 @@ require([
   'esri/Graphic',
   'esri/layers/GraphicsLayer',
   'esri/widgets/Sketch/SketchViewModel',
+  'esri/views/2d/draw/Draw',
   'esri/layers/ElevationLayer',
   'esri/Ground',
   'esri/request',
@@ -34,7 +35,7 @@ require([
 ], function (
   Map, MapView, Viewpoint, Basemap, Point, TileLayer,
   FeatureLayer, Extent, SpatialReference,
-  LayerList, Locate, Search, Graphic, GraphicsLayer, SketchViewModel,
+  LayerList, Locate, Search, Graphic, GraphicsLayer, SketchViewModel, Draw,
   ElevationLayer, Ground, esriRequest, esriConfig, on, dom
 ) {
   esriConfig.request.corsEnabledServers.push("www.norgeskart.no");
@@ -161,67 +162,6 @@ require([
 
   view.when(function (evt) {
  // create a new sketch view model
-    var sketchViewModel = new SketchViewModel({
-      view: view,
-      polylineSymbol: { // symbol used for polylines
-        type: 'simple-line', // autocasts as new SimpleMarkerSymbol()
-        color: '#ED9300',
-        width: '4',
-        style: 'dash',
-        attributes: {
-          'Name': 'Test'
-        }
-      },
-      polygonSymbol: { // symbol used for polygons
-        type: 'simple-fill', // autocasts as new SimpleMarkerSymbol()
-        color: 'rgba(237, 224, 202, 0.57)',
-        style: 'solid',
-        outline: {
-          color: '#ED9300',
-          width: '4',
-          style: 'dash'
-        },
-        attributes: {
-          'Name': 'Test'
-        }
-      }
-    })
-    sketchViewModel.on('draw-complete', function (evt) {
-      console.log(evt)
-      //  TODO:Lag logikk som ikke kopierer kode her
-      freehandIcon.classList.add('hide')
-      undoIcon.classList.add('hide')
-      view.graphics.add(evt.graphic)
-
-      setActiveButton()
-    })
-
-    var dragEvent = {}
-    view.on('drag', function (evt) {
-      if (evt.action === 'start') {
-        dragEvent.start = view.toMap(evt.origin)
-      } else if (evt.action === 'end') {
-        dragEvent.end = view.toMap(evt.origin)
-      }
-    })
-
- // ****************************************
- // activate the sketch to create a polyline
- // ****************************************
-   //  var drawLineButton = document.getElementById('polylineButton')
-   //  drawLineButton.onclick = function () {
-   //    freehandIcon.classList.remove('hide')
-   //    undoIcon.classList.remove('hide')
-   //    if (view.graphics.length > 0) {
-   //      if (view.graphics.items[0].symbol.type === 'picture-marker') {
-   //        view.graphics.removeAll()
-   //      }
-   //    }
-   // // set the sketch to create a polyline geometry
-   //    sketchViewModel.create('polyline')
-   //    sketchViewModel.draw.activeAction._dragEnabled = false
-   //    setActiveButton(this)
-   //  }
 
  // ***************************************
  // activate the sketch to create a polygon
@@ -348,12 +288,18 @@ require([
     var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]')
     var registrerTopp = document.querySelector('[name="regnytopp"]')
     var parkeringkartDiv = document.querySelector('#parkeringViewDiv')
+    var ruteinfoDiv = document.querySelector('#ruteinfo')
     var viewDivTest = document.querySelector('#toppViewDiv');
     var valgtToppInfo = document.querySelector('[name="valgt-topp-info"]');
     var nytoppknapp = document.querySelector('#nyTopp');
     var uiComponents = document.querySelector('#toppViewDiv > div.map-ui-component');
     var sokinput = document.querySelector('.map-ui-component input[type=text]')
+    var currentLayer = topp
     console.log(sokinput);
+
+    var draw = new Draw({
+      view: view
+    })
 
     var valgInformasjon = {}
     // uiComponents.push(view.ui.container)
@@ -373,18 +319,17 @@ require([
       uiComponents.classList.remove('borte');
       view.container.classList.remove('halv-aapen');
       valgtToppInfo.classList.add('borte');
-      topp.definitionExpression = null;
+      currentLayer.definitionExpression = null;
       view.layerViews.items.map(function(obj){
         obj.layer.opacity = 1
       })
-      topp.visible = true
+      currentLayer.visible = true
       view.cursor = 'pointer'
       console.log('Kart resett');
     }
     function registreringsViz(view){
       grafikkLag.removeAll();
-      topp.opacity = 0.3;
-      parkering.opacity = 0.3;
+      currentLayer.opacity = 0.3;
       view.cursor = 'crosshair'
     }
     function leggTilPkt(kartpkt){
@@ -410,45 +355,113 @@ require([
       return grafikk
     }
 
+    function enableCreatePolyline(draw, view) {
+      var action = draw.create("polyline");
 
-  function skiftRegnivaa(registreringsnivaa){
-    //  Loope gjennom alle tittel-knapper og sette den riktige til aktiv
-    Array.prototype.map.call(document.querySelectorAll('.accordion'), function(obj){
-      console.log(obj.dataset.regtype);
-      if(obj.dataset.regtype === registreringsnivaa){
-        obj.classList.add('active')
-      } else {
-        obj.classList.remove('active')
+      // listen to PolylineDrawAction.vertex-add
+      // Fires when the user clicks, or presses the "F" key
+      // Can also fire when the "R" key is pressed to redo.
+      action.on("vertex-add", function (evt) {
+        createPolylineGraphic(evt.vertices);
+      });
+
+      // listen to PolylineDrawAction.vertex-remove
+      // Fires when the "Z" key is pressed to undo the
+      // last added vertex
+      action.on("vertex-remove", function (evt) {
+        createPolylineGraphic(evt.vertices);
+      });
+
+      // listen to PolylineDrawAction.cursor-update
+      // fires when the pointer moves over the view
+      action.on("cursor-update", function (evt) {
+        createPolylineGraphic(evt.vertices);
+      });
+
+      // listen to PolylineDrawAction.draw-complete
+      // event to create a graphic when user double-clicks
+      // on the view or presses the "C" key
+      action.on("draw-complete", function (evt) {
+        var grafikk = createPolylineGraphic(evt.vertices);
+        console.log(grafikk);
+        viewDivTest.classList.add('halv-aapen')
+        toggleUi(view, 'off')
+        vmRuteInfo.lagretGrafikk = grafikk
+      });
+    }
+
+    function createPolylineGraphic(vertices){
+      view.graphics.removeAll();
+      var polyline = {
+        type: "polyline", // autocasts as Polyline
+        paths: vertices,
+        spatialReference: view.spatialReference
+      };
+      var graphic = new Graphic({
+        geometry: polyline,
+        symbol: {
+          type: "simple-line", // autocasts as SimpleLineSymbol
+          color: [255, 0, 0],
+          width: 3,
+          cap: "round",
+          join: "round"
+        }
+      });
+      view.graphics.add(graphic);
+      return graphic
+    }
+
+    function hentToppInfo (x,y) {
+      var urlSted = 'https://www.norgeskart.no/ws/elev.py?'
+      var options = {
+        query: {
+          lat: y,
+          lon: x,
+          epsg: 25833
+        }
       }
-    })
-    //  Loope gjennom alle 'panel' - objekt og skru av de som ikke har regtype === regstatus (bruker ternarny)'
-    Array.prototype.map.call(document.querySelectorAll('.panel'), function(obj){
-      console.log(obj.dataset.regtype);
-      if(obj.dataset.regtype === registreringsnivaa){
-        obj.classList.remove('borte')
-        obj.classList.add('aapen')
-      } else {
-        obj.classList.add('borte')
-      }
-    })
-    //  Loope gjennom knapper i kart og skru av de som ikke stemmer med registreringsstatus
-    Array.prototype.map.call(document.querySelectorAll('.action-button'), function(obj){
-      if (obj.dataset.regtype === registreringsnivaa) {
-        obj.classList.remove('borte')
-      } else {
-        obj.classList.add('borte')
-      }
-    })
-    //  Loope gjennom kart og aktivere de
-    view.map.layers.items.map(function(obj){
-      console.log(obj);
-      if (obj.id === registreringsnivaa) {
-        obj.visible = true
-      } else {
-        obj.visible = false
-      }
-    })
-  }
+      return esriRequest(urlSted, options)
+    }
+
+    function skiftRegnivaa(registreringsnivaa){
+      //  Loope gjennom alle tittel-knapper og sette den riktige til aktiv
+      Array.prototype.map.call(document.querySelectorAll('.accordion'), function(obj){
+        console.log(obj.dataset.regtype);
+        if(obj.dataset.regtype === registreringsnivaa){
+          obj.classList.add('active')
+        } else {
+          obj.classList.remove('active')
+        }
+      })
+      //  Loope gjennom alle 'panel' - objekt og skru av de som ikke har regtype === regstatus (bruker ternarny)'
+      Array.prototype.map.call(document.querySelectorAll('.panel'), function(obj){
+        console.log(obj.dataset.regtype);
+        if(obj.dataset.regtype === registreringsnivaa){
+          obj.classList.remove('borte')
+          obj.classList.add('aapen')
+        } else {
+          obj.classList.add('borte')
+        }
+      })
+      //  Loope gjennom knapper i kart og skru av de som ikke stemmer med registreringsstatus
+      Array.prototype.map.call(document.querySelectorAll('.action-button'), function(obj){
+        if (obj.dataset.regtype === registreringsnivaa) {
+          obj.classList.remove('borte')
+        } else {
+          obj.classList.add('borte')
+        }
+      })
+      //  Loope gjennom kartlag og aktivere de
+      view.map.layers.items.map(function(obj){
+        console.log(obj);
+        if (obj.id === registreringsnivaa) {
+          obj.visible = true
+          currentLayer = obj
+        } else {
+          obj.visible = false
+        }
+      })
+    }
 
     function toggleUi(view, tilstand){
       if (tilstand === 'on') {
@@ -467,6 +480,7 @@ require([
       }
     }
     view.container.addEventListener('keydown', function(evt){
+      console.log(evt);
       if (evt.ctrlKey && evt.keyCode === 188) {
         console.log("View",view);
         view.map.layers.map(function(obj){
@@ -476,12 +490,18 @@ require([
       }
     })
 
+    view.container.addEventListener('keydown', function(evt){
+      if (evt.key === 'Backspace' && draw.activeAction) {
+        draw.activeAction.undo()
+      }
+    })
+
     on(sokinput, 'key-up', function () {
       alert('dfghdfghdfgh')
       document.querySelector('#sokResultat').classList.remove('borte')
     })
 
-
+    //  Setter opp event handler for når man klikker i kartet
     on(view, 'click', function(event) {
       console.log(event);
       var hittest = {}
@@ -502,15 +522,21 @@ require([
           viewDivTest.classList.add('halv-aapen')
           //  Hvis friluftstype er lik fjell, oppdater vue info for fjell-info
           if (resultat.friluftstype === 'topp') {
-            vmValgResultatFjell.valgttopp.navn = resultat.navn.length > 0 ? resultat.navn : "Ikke registrert navn",
-            vmValgResultatFjell.valgttopp.hoyde = resultat.hoyde,
-            vmValgResultatFjell.valgttopp.beskrivelse = resultat.beskrivelse.length > 0 ? resultat.beskrivelse : "Ikke registrert beskrivelse",
+            vmValgResultatFjell.valgttopp.navn = resultat.navn.length > 0 ? resultat.navn : "Ikke registrert navn"
+            vmValgResultatFjell.valgttopp.hoyde = resultat.hoyde
+            vmValgResultatFjell.valgttopp.beskrivelse = resultat.beskrivelse.length > 0 ? resultat.beskrivelse : "Ikke registrert beskrivelse"
             vmValgResultatFjell.valgttopp.merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merknad"
-            topp.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
+            currentLayer.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
             valgtToppInfo.classList.remove('borte')
           //  Hvis friluftstype er lik parkering oppdater vue infor for parkering-info
           } else if (resultat.friluftstype === 'parkering') {
-
+            console.log(resultat);
+            vmParkeringInfo.valgtparkering.navn = resultat.navn ? resultat.navn : 'Ikke registrert navn'
+            vmParkeringInfo.valgtparkering.friluftstype = resultat.friluftstype
+            vmParkeringInfo.valgtparkering.broytet = resultat.broytet ? resultat.broytet : 'Ikke registrert'
+            vmParkeringInfo.valgtparkering.merknad = resultat.merknad ? resultat.merknad : 'Ingen registrert merknad'
+            vmParkeringInfo.valgtparkering.plasser = resultat.antallplasser ? resultat.antallplasser : 'Ikke registrert'
+            currentLayer.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
           }
           //  Hvis ingen av de ovenfor matcher, gjør dette
           else {
@@ -528,49 +554,58 @@ require([
         .then(function(response){
           viewDivTest.classList.add('halv-aapen')
           toggleUi(view, 'off')
+          // TODO: Erstatt dette med vue-opplegg slik som på parkering og rute
           formFjellWrapper.classList.remove('borte')
           formFjellWrapper.classList.add('aapen')
-          topp.opacity = 1
-          topp.visible = false
+          currentLayer.opacity = 1
+          currentLayer.visible = false
+          hentToppInfo(event.mapPoint.x,event.mapPoint.y)
+          .then(function(response){
+            if (document.querySelector('[name="toppnavn"]').value.length === 0) {
+              console.log('Fjelltoppinfo',response);
+              vmToppReg.fjellSkjema.navn.verdi = response.data.placename
+              vmToppReg.fjellSkjema.hoyde.verdi = Math.round(response.data.elevation)
+            }
+          })
           console.log(view);
         })
+        //  Logikk for hva som skal skje om state er at man skal registrere en ny parkering
         } else if (response.results.length === 0 && stateHandler === 'nyParkering') {
           console.log('Statehandler = ' + stateHandler);
           grafikkLag.removeAll();
           var grafikk = leggTilPkt(event.mapPoint)
-          vmToppReg.lagretGrafikk = true;
+          vmParkeringInfo.lagretGrafikk = true;
           grafikkLag.graphics.add(grafikk)
+          grafikkLag.visible = true
           view.goTo({
             target: grafikk
           })
           .then(function(response){
             viewDivTest.classList.add('halv-aapen')
             toggleUi(view, 'off')
-            formFjellWrapper.classList.remove('borte')
-            formFjellWrapper.classList.add('aapen')
-            topp.opacity = 1
-            topp.visible = false
+            currentLayer.opacity = 1
+            currentLayer.visible = false
             console.log(view);
           })
         }
         else if (response.results.length === 0 && stateHandler === 'nyRute') {
           console.log('Statehandler = ' + stateHandler);
-          grafikkLag.removeAll();
+          // grafikkLag.removeAll();
           // Legg til linjegrafikk
-          vmToppReg.lagretGrafikk = true;
-          grafikkLag.graphics.add(grafikk)
-          view.goTo({
-            target: grafikk
-          })
-          .then(function(response){
-            viewDivTest.classList.add('halv-aapen')
-            toggleUi(view, 'off')
-            formFjellWrapper.classList.remove('borte')
-            formFjellWrapper.classList.add('aapen')
-            topp.opacity = 1
-            topp.visible = false
-            console.log(view);
-          })
+          // vmToppReg.lagretGrafikk = true;
+          // grafikkLag.graphics.add(grafikk)
+          // view.goTo({
+          //   target: grafikk
+          // })
+          // .then(function(response){
+          //   // viewDivTest.classList.add('halv-aapen')
+          //   // toggleUi(view, 'off')
+          //   // formFjellWrapper.classList.remove('borte')
+          //   // formFjellWrapper.classList.add('aapen')
+          //   // topp.opacity = 1
+          //   // topp.visible = false
+          //   console.log(view);
+          // })
         } else {
           // view.container.classList.add('borte')
           // view.container = null
@@ -578,6 +613,27 @@ require([
       }).otherwise(function(error){
         console.log(error);
       })
+    })
+    //  Event handler for å registrere ny fjelltopp
+    on(document.querySelector('#nyParkering'), 'click', function (event) {
+      console.log(view);
+      view.graphics.removeAll();
+      grafikkLag.graphics.removeAll();
+      registreringsViz(view)
+      stateHandler = 'nyParkering'
+    })
+
+    // Event handler for å registrere ny rute
+    on(document.querySelector('#nyRute'), 'click', function (event) {
+      console.log(view);
+      view.graphics.removeAll();
+      grafikkLag.graphics.removeAll();
+      view.layerViews.items.map(function(obj){
+        obj.layer.opacity = 1
+      })
+      registreringsViz(view)
+      stateHandler = 'nyRute'
+      enableCreatePolyline(draw, view)
     })
 
     on(nytoppknapp, 'click', function (event) {
@@ -599,6 +655,8 @@ require([
       }
 
     })
+
+
 
     var vmInfoBoard = new Vue({
       el: '#sokInfo',
@@ -721,12 +779,39 @@ require([
     var vmToppReg = new Vue({
       el: '#fjelltopFormWrapper',
       data: {
-        lagretGrafikk: false
+        lagretGrafikk: false,
+        fjellSkjema: {
+          navn: {
+            verdi: null,
+            bekreftet: false
+          },
+          hoyde: {
+            verdi: null,
+            bekreftet: false
+          },
+          beskrivelse: null,
+          merknad: null
+        }
       },
       methods: {
         resetkart: function () {
           resetKart(view);
+          this.tomSkjema();
           this.lagretGrafikk = false;
+        },
+        tomSkjema: function () {
+          this.fjellSkjema = {
+            navn: {
+              verdi: null,
+              bekreftet: false
+            },
+            hoyde: {
+              verdi: null,
+              bekreftet: false
+            },
+            beskrivelse: null,
+            merknad: null
+          }
         }
         // registrerFF: function () {
         //
@@ -762,7 +847,7 @@ require([
           // parkeringinfoKnapp.classList.add('active')
           regState = 'parkering'
           resetKart(view)
-          parkeringinfoDiv.insertBefore(viewDivTest, document.querySelector('#parkeringinfo .form-wrapper'))
+          parkeringinfoDiv.insertBefore(viewDivTest, document.querySelector('#parkeringInfoWrapper'))
           skiftRegnivaa(regState)
           // topp.visible = false;
           // parkering.visible = true;
@@ -783,19 +868,28 @@ require([
         }
       }
     })
-
-    var vmValgResultatParkering = new Vue({
-      el: '#valgtParkering',
+    // Vue instance for parkeringsinformasjon
+    var vmParkeringInfo = new Vue({
+      el: '#parkeringInfoWrapper',
       data: {
         lagretGrafikk: false,
+        parkeringsId: null,
         valgtparkering: {
-          navn: '',
+          navn: null,
           plasser: null ,
-          broytet: '',
-          merknad: 'Ingen registrerte merknader'
+          broytet: null,
+          merknad: null,
+          friluftstype: null
         }
       },
       methods: {
+        velgparkering: function () {
+          regState = 'rute'
+          resetKart(view)
+          document.querySelector('#ruteinfo').insertBefore(viewDivTest, document.querySelector('#ruteInfoWrapper'))
+          skiftRegnivaa(regState)
+          currentLayer.opacity = 0.3;
+        },
         velgnyparkering: function () {
           this.resetValgtParkering();
           resetKart(view);
@@ -807,20 +901,68 @@ require([
         },
         registrerParkering: function(event) {
           resetKart(view, event.mapPoint);
-          parkering.opacity = 1;
-          parkering.definitionExpression = ''
+          currentLayer.opacity = 1;
+          currentLayer.definitionExpression = ''
+          //  Aååly edits. Send inn innlagt pkt og lagre response-objectid i parkeringsid
         },
-        resetValgtParkering: function(){
-          this.valgtparkering = {
-            navn: '',
-            hoyde: null ,
-            beskrivelse: '',
-            merknad: 'Ingen registrerte merknader'
+        resetValgtParkering: function () {
+          this.resetkart();
+          vmParkeringInfo.valgtparkering = {
+            navn: null,
+            plasser: null ,
+            broytet: null,
+            merknad: null,
+            friluftstype: null
           }
         },
         resetkart: function () {
-          resetKart(view);
-          this.lagretGrafikk = false;
+          vmParkeringInfo.lagretGrafikk = false;
+          stateHandler = 'default'
+          grafikkLag.removeAll();
+          view.graphics.removeAll();
+          view.ui.container.classList.remove('borte');
+          uiComponents.classList.remove('borte');
+          view.container.classList.remove('halv-aapen');
+          currentLayer.definitionExpression = null;
+          view.layerViews.items.map(function(obj){
+            obj.layer.opacity = 1
+          })
+          currentLayer.visible = true
+          view.cursor = 'pointer'
+          console.log('Kart resett');
+        }
+      }
+    })
+
+    //  Vue instance for ruteregistrering
+    var vmRuteInfo = new Vue({
+      el: '#ruteinfo',
+      data: {
+        lagretGrafikk: null,
+        lagretRuteID: null
+      },
+      methods: {
+        registrerRute: function(event) {
+          resetKart(view, event.mapPoint);
+          //  Apply edits lagretGrafikk
+          currentLayer.opacity = 1;
+          currentLayer.definitionExpression = ''
+        },
+        resetkart: function () {
+          vmParkeringInfo.lagretGrafikk = false;
+          stateHandler = 'default'
+          grafikkLag.removeAll();
+          view.graphics.removeAll();
+          view.ui.container.classList.remove('borte');
+          uiComponents.classList.remove('borte');
+          view.container.classList.remove('halv-aapen');
+          currentLayer.definitionExpression = null;
+          view.layerViews.items.map(function(obj){
+            obj.layer.opacity = 1
+          })
+          currentLayer.visible = true
+          view.cursor = 'pointer'
+          console.log('Kart resett');
         }
       }
     })
@@ -868,73 +1010,6 @@ require([
       console.log(error)
     })
   }
-
-  // var vegrefView = new MapView({
-  //   map: map,
-  //   container: 'vegrefDiv'
-  // })
-  //
-  // var refKnapp = document.querySelector('#vegrefIcon')
-  // var lukkRefKnapp = document.querySelector('#lukkVegref')
-
-  // vegrefView.constraints.rotationEnabled = false
-  // vegrefView.extent = startVindu
-  // vegrefView.ui.add('vegrefIcon', 'top-left')
-  // vegrefView.ui.add('lukkVegref', 'top-right')
-  // vegrefView.when(function () {
-  //   refKnapp.classList.remove('hide')
-  //   lukkRefKnapp.classList.remove('hide')
-  // })
-
-  // on(refKnapp, 'click', function () {
-  //   var modal = document.querySelector('.vegrefModal')
-  //   var meldingTekst = document.querySelector('.vegref-prompt p')
-  //   var jaKnapp = document.querySelector('[name="yes"]')
-  //   var nyttSok = document.querySelector('[name="newsearch"]')
-  //   vegrefDiv.style.cursor = 'crosshair'
-  //   on.once(vegrefView, 'click', function (evt) {
-  //     vegrefDiv.style.cursor = 'default'
-  //     evt.stopPropagation()
-  //     if (evt.mapPoint) {
-  //       var url = 'https://www.vegvesen.no/nvdb/api/v2/posisjon.json?nord=' + evt.mapPoint.y + '&ost=' + evt.mapPoint.x
-  //       var oReq = new XMLHttpRequest()
-  //       oReq.open('GET', url, true)
-  //       oReq.onload = function (oEvent) {
-  //         on.once(nyttSok, 'click', function () {
-  //           modal.classList.add('borte')
-  //           vegrefDiv.style.cursor = 'default'
-  //         })
-  //         if (oReq.status === 200) {
-  //           jaKnapp.classList.remove('borte')
-  //           var querySvar = JSON.parse(oReq.response) // Sender tekst tilbake fra php-scriptet
-  //           meldingTekst.innerHTML = '<p>Funnet vegreferanse er: <b>' +
-  //                                     querySvar[0].vegreferanse.kortform +
-  //                                     '</b>.</p><p>Vil du legge til denne vegreferansen eller søke på nytt?</p>'
-  //           modal.classList.remove('borte')
-  //           on.once(jaKnapp, 'click', function () {
-  //             document.querySelector('[name="vegreferanse"]').value = querySvar[0].vegreferanse.kortform
-  //             view.extent = vegrefView.extent
-  //             modal.classList.add('borte')
-  //             vegrefDiv.classList.remove('aapen')
-  //             vegrefDiv.style.cursor = 'default'
-  //             console.log(vegrefView)
-  //           })
-  //         } else if ((oReq.status === 404)) {
-  //           meldingTekst.innerHTML = '<p>Avstanden til nærmeste veg er for lang. Søk på nytt og klikk nærmere vegkroppen</p>'
-  //           modal.classList.remove('borte')
-  //           jaKnapp.classList.add('borte')
-  //         }
-  //       }
-  //       oReq.send()
-  //     }
-  //   })
-  //   // vegrefDiv.style.cursor = "crosshair"
-  //   // Ajax-kall for å hente inn vegrefDiv
-  // })
-
-  // lukkRefKnapp.addEventListener('click', function () {
-  //   vegrefDiv.classList.remove('aapen')
-  // })
 
   document.getElementById('sendinn').addEventListener('click', function () {
     if (view.graphics.length > 0 && skjemaValidering()) {

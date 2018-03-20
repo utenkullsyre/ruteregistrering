@@ -78,9 +78,13 @@ a:hover{
   opacity: 0!important;}
 }
 
-.inline-img{
+.title-img{
 position: relative;
 top: 4px;
+}
+
+.inline-img{
+  height: 1em
 }
 
 .kart-img{
@@ -657,6 +661,13 @@ textarea {
     width:100% !important;
     left: 1px;
     top: 42px;
+  }
+
+  .esri-ui-corner-container{
+      top: 4px !important;
+      left: 4px !important;
+      right: 4px !important;
+      bottom: 20px !important;
   }
 
 }
