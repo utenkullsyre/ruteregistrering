@@ -780,7 +780,8 @@ require([
               'navn': this.fjellSkjema.navn.verdi,
               'hoyde': this.fjellSkjema.hoyde.verdi,
               'beskrivelse': this.fjellSkjema.beskrivelse,
-              'merknad': this.fjellSkjema.merknad
+              'merknad': this.fjellSkjema.merknad,
+              'friluftstype': 'topp'
             }
             grafikk.attributes = attributter
             var edits = {
@@ -903,7 +904,8 @@ require([
               antallplasser: this.parkeringSkjema.antallplasser,
               broytet: this.parkeringSkjema.broytet,
               merknad: this.parkeringSkjema.merknad,
-              navn: this.parkeringSkjema.navn
+              navn: this.parkeringSkjema.navn,
+              friluftstype: 'parkering'
             }
             grafikk.attributes = attributter
             var edits = {
@@ -915,10 +917,11 @@ require([
               if (response.addFeatureResults["0"].objectId) {
                 this.parkeringsId = response.addFeatureResults["0"].objectId
                 vmParkeringInfo.velgparkering();
-                topp.definitionExpression = vmToppReg.fjellId;
-                parkering.definitionExpression = vmParkeringInfo.parkeringID;
-                topp.visible = true
-                parkering.visible = true
+                // topp.definitionExpression = vmToppReg.fjellId;
+                // parkering.definitionExpression = vmParkeringInfo.parkeringID;
+                console.log(topp, parkering);
+                // topp.visible = true
+                // parkering.visible = true
                 console.log(vmParkeringInfo.parkeringID);
               } else {
                 console.log('!!Finner ikke parkeringID, se logg!!', response);
@@ -930,6 +933,11 @@ require([
           }
         },
         velgparkering: function () {
+          topp.definitionExpression = vmToppReg.fjellId
+          parkering.definitionExpression = vmParkeringInfo.parkeringsId
+          topp.visible = true
+          parkering.visible = true
+          console.log(vmToppReg.fjellId, vmParkeringInfo.parkeringsId);
           regState = 'rute'
           resetKart(view)
           document.querySelector('#ruteinfo').insertBefore(viewDivTest, document.querySelector('#ruteInfoWrapper'))
