@@ -742,12 +742,6 @@ require([
           hoyde: null ,
           beskrivelse: '',
           merknad: 'Ingen registrerte merknader'
-        },
-        valgtparkering: {
-          navn: '',
-          plasser: null ,
-          broytet: '',
-          merknad: 'Ingen registrerte merknader'
         }
       },
       methods: {
@@ -793,6 +787,7 @@ require([
     var vmValgResultatParkering = new Vue({
       el: '#valgtParkering',
       data: {
+        lagretGrafikk: false,
         valgtparkering: {
           navn: '',
           plasser: null ,
@@ -801,8 +796,8 @@ require([
         }
       },
       methods: {
-        velgnytopp: function () {
-          this.resetValgtTopp();
+        velgnyparkering: function () {
+          this.resetValgtParkering();
           resetKart(view);
           view.goTo({
             target: event.mapPoint
@@ -810,18 +805,22 @@ require([
             view.focus()
           })
         },
-        registrerTopp: function(event) {
+        registrerParkering: function(event) {
           resetKart(view, event.mapPoint);
           parkering.opacity = 1;
           parkering.definitionExpression = ''
         },
-        resetValgtTopp: function(){
+        resetValgtParkering: function(){
           this.valgtparkering = {
             navn: '',
             hoyde: null ,
             beskrivelse: '',
             merknad: 'Ingen registrerte merknader'
           }
+        },
+        resetkart: function () {
+          resetKart(view);
+          this.lagretGrafikk = false;
         }
       }
     })
