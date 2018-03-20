@@ -127,11 +127,6 @@ require([
     })
   })
 
-
-  var searchWidget = new Search({
-    view: view
-  })
-
   var sokSymbol = {
     type: "simple-marker",
     outline: {
@@ -154,75 +149,13 @@ require([
   view.ui.add('nyTopp', 'bottom-right')
   view.ui.add('nyParkering', 'bottom-right')
   view.ui.add('nyRute', 'bottom-right')
+  view.ui.add('freehandButton', 'bottom-right')
+  view.ui.add('undoButton', 'bottom-right')
+  view.ui.add('resetBtn', 'bottom-right')
   //  test = view;
 
   document.querySelector('#kartmodal > div.dimmed').addEventListener('click', function(evt){
     evt.target.parentElement.classList.add('borte')
-  })
-
-  view.when(function (evt) {
- // create a new sketch view model
-
- // ***************************************
- // activate the sketch to create a polygon
- // ***************************************
-   //  var drawPolygonButton = document.getElementById('polygonButton')
-   //  drawPolygonButton.onclick = function (event) {
-   //    freehandIcon.classList.remove('hide')
-   //    undoIcon.classList.remove('hide')
-   //    view.graphics.removeAll()
-   // // set the sketch to create a polygon geometry
-   //    sketchViewModel.create('polygon')
-   //    sketchViewModel.draw.activeAction._dragEnabled = false
-   //    sketchViewModel.draw.activeAction.on('vertex-add', function (evt) {
-   //      if (evt.native.ctrlKey) {
-   //        evt.preventDefault()
-   //      }
-   //    // if(evt.native.offsetY == dragEvent.end.y || evt.native.offsetY == dragEvent.start.y){
-   //    //   evt.preventDefault();
-   //    //   console.log('Det funka!!',evt);
-   //    // }
-   //    })
-   //    setActiveButton(this)
-   //  }
-
- // **************
- // reset button
- // **************
-    // document.getElementById('resetBtn').onclick = function () {
-    //   freehandIcon.classList.add('hide')
-    //   undoIcon.classList.add('hide')
-    //   view.graphics.removeAll()
-    //   sketchViewModel.reset()
-    //   setActiveButton()
-    // }
-
-    // freehandIcon.addEventListener('click', function () {
-    //   if (sketchViewModel.draw.activeAction) {
-    //     sketchViewModel.draw.activeAction._dragEnabled = !sketchViewModel.draw.activeAction._dragEnabled
-    //     this.classList.toggle('aktiv')
-    //   }
-    // })
-
-    // undoIcon.addEventListener('click', function () {
-    //   sketchViewModel.draw.activeAction.undo()
-    // })
-
-    function setActiveButton (selectedButton) {
-   // focus the view to activate keyboard shortcuts for sketching
-      view.focus()
-      var elements = document.querySelectorAll('.aktiv')
-      Array.prototype.map.call(elements, function (obj) {
-        obj.classList.remove('aktiv')
-      })
-
-      if (selectedButton) {
-        selectedButton.classList.add('aktiv')
-      }
-    }
-  }).otherwise(function (error) {
-  // This function is called when the promise is rejected
-    console.error(error)  // Logs the error message
   })
 
   function stedsSok (evt) {
@@ -246,29 +179,6 @@ require([
           responseType: 'xml'
         };
         return esriRequest(url, options)
-        // .then(function(response) {
-        //   var resultat = []
-        //   Array.prototype.map.call(response.data.childNodes["0"].childNodes,function(obj){
-        //     if (obj.localName === "stedsnavn"){
-        //       el = obj
-        //       console.log(el);
-        //       var stedsnavnObjekt = {}
-        //       stedsnavnObjekt.navn = obj.childNodes[4].innerHTML;
-        //       stedsnavnObjekt.type = obj.childNodes[1].innerHTML.toLowerCase();
-        //       stedsnavnObjekt.kommune = obj.childNodes[2].innerHTML;
-        //       stedsnavnObjekt.fylke = obj.childNodes[3].innerHTML;
-        //       stedsnavnObjekt.x = obj.childNodes[5].innerHTML;
-        //       stedsnavnObjekt.y = obj.childNodes[6].innerHTML;
-        //       stedsnavnObjekt.epsg = obj.childNodes[10].innerHTML;
-        //       stedsnavnObjekt.stedsnr = obj.childNodes[11].innerHTML;
-        //       resultat.push(stedsnavnObjekt)
-        //     }
-        //   })
-        //   // TODO: Bytt ut denne blokka med ternary operator
-        //   vmInfoBoard.resultatSynlig = true;
-        //   vmInfoBoard.resultat = resultat;
-        //   vmInfoBoard.stedsNavn = evt.target.value;
-        // })
     }}
 
   view.when(function () {
@@ -294,6 +204,9 @@ require([
     var nytoppknapp = document.querySelector('#nyTopp');
     var uiComponents = document.querySelector('#toppViewDiv > div.map-ui-component');
     var sokinput = document.querySelector('.map-ui-component input[type=text]')
+    var undoKnapp = document.querySelector('#undoButton');
+    var friKnapp = document.querySelector('#freehandButton');
+    var resetKnapp = document.querySelector('#resetBtn');
     var currentLayer = topp
     console.log(sokinput);
 
@@ -311,6 +224,19 @@ require([
 
     view.cursor = 'pointer'
 
+    function setActiveButton (selectedButton) {
+   // focus the view to activate keyboard shortcuts for sketching
+      view.focus()
+      var elements = document.querySelectorAll('.aktiv')
+      Array.prototype.map.call(elements, function (obj) {
+        obj.classList.remove('aktiv')
+      })
+
+      if (selectedButton) {
+        selectedButton.classList.add('aktiv')
+      }
+    }
+
     function resetKart(view){
       stateHandler = 'default'
       grafikkLag.removeAll();
@@ -320,18 +246,20 @@ require([
       view.container.classList.remove('halv-aapen');
       valgtToppInfo.classList.add('borte');
       currentLayer.definitionExpression = null;
-      view.layerViews.items.map(function(obj){
-        obj.layer.opacity = 1
+      view.map.layers.items.map(function(obj){
+        obj.opacity = 1
       })
       currentLayer.visible = true
       view.cursor = 'pointer'
       console.log('Kart resett');
     }
+
     function registreringsViz(view){
       grafikkLag.removeAll();
       currentLayer.opacity = 0.3;
       view.cursor = 'crosshair'
     }
+
     function leggTilPkt(kartpkt){
       var point = {
         type: "point",  // autocasts as new Point()
@@ -353,6 +281,25 @@ require([
         symbol: markerSymbol
       })
       return grafikk
+    }
+
+    function visRedKnapper(state) {
+      var knapper = [undoKnapp, friKnapp, resetKnapp]
+      if (state === 'on') {
+        knapper.map(function(obj){
+          obj.classList.remove('borte')
+          setTimeout(function(){
+            obj.classList.remove('hide')
+          }, 50)
+        })
+      } else if (state === 'off') {
+        knapper.map(function( obj ){
+          obj.classList.add('hide')
+          setTimeout(function () {
+            obj.classList.add('borte')
+          }, 50)
+        })
+      }
     }
 
     function enableCreatePolyline(draw, view) {
@@ -387,6 +334,8 @@ require([
         viewDivTest.classList.add('halv-aapen')
         toggleUi(view, 'off')
         vmRuteInfo.lagretGrafikk = grafikk
+        visRedKnapper('off')
+        setActiveButton()
       });
     }
 
@@ -527,6 +476,7 @@ require([
             vmValgResultatFjell.valgttopp.beskrivelse = resultat.beskrivelse.length > 0 ? resultat.beskrivelse : "Ikke registrert beskrivelse"
             vmValgResultatFjell.valgttopp.merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merknad"
             currentLayer.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
+            vmToppReg.fjellId = resultat.OBJECTID
             valgtToppInfo.classList.remove('borte')
           //  Hvis friluftstype er lik parkering oppdater vue infor for parkering-info
           } else if (resultat.friluftstype === 'parkering') {
@@ -537,6 +487,7 @@ require([
             vmParkeringInfo.valgtparkering.merknad = resultat.merknad ? resultat.merknad : 'Ingen registrert merknad'
             vmParkeringInfo.valgtparkering.plasser = resultat.antallplasser ? resultat.antallplasser : 'Ikke registrert'
             currentLayer.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
+            vmParkeringInfo.parkeringsId = resultat.OBJECTID
           }
           //  Hvis ingen av de ovenfor matcher, gjør dette
           else {
@@ -546,7 +497,7 @@ require([
         console.log('Statehandler = ' + stateHandler);
         grafikkLag.removeAll();
         var grafikk = leggTilPkt(event.mapPoint)
-        vmToppReg.lagretGrafikk = true;
+        vmToppReg.lagretGrafikk = grafikk;
         grafikkLag.graphics.add(grafikk)
         view.goTo({
           target: grafikk
@@ -574,7 +525,7 @@ require([
           console.log('Statehandler = ' + stateHandler);
           grafikkLag.removeAll();
           var grafikk = leggTilPkt(event.mapPoint)
-          vmParkeringInfo.lagretGrafikk = true;
+          vmParkeringInfo.lagretGrafikk = grafikk;
           grafikkLag.graphics.add(grafikk)
           grafikkLag.visible = true
           view.goTo({
@@ -626,14 +577,41 @@ require([
     // Event handler for å registrere ny rute
     on(document.querySelector('#nyRute'), 'click', function (event) {
       console.log(view);
+      parkering.visible = true;
+      parkering.definitionExpression = vmParkeringInfo.parkeringID
       view.graphics.removeAll();
       grafikkLag.graphics.removeAll();
-      view.layerViews.items.map(function(obj){
-        obj.layer.opacity = 1
-      })
+      grafikkLag.visible = true
+      grafikkLag.opacity = 1
+      // view.map.layers.items.map(function(obj){
+      //   obj.opacity = 1
+      // })
+      setActiveButton(this)
+      visRedKnapper('on')
       registreringsViz(view)
       stateHandler = 'nyRute'
       enableCreatePolyline(draw, view)
+      draw.activeAction._dragEnabled = false
+    })
+
+    on(friKnapp, 'click', function (evt) {
+      this.classList.toggle('aktiv')
+      if (draw.activeAction) {
+        draw.activeAction._dragEnabled = !draw.activeAction._dragEnabled
+      }
+    })
+
+    on(undoKnapp, 'click', function (evt) {
+      if (draw.activeAction) {
+        draw.activeAction.undo()
+      }
+    })
+
+    on(resetKnapp, 'click', function (evt) {
+      view.graphics.removeAll();
+      setActiveButton();
+      visRedKnapper('off')
+      draw.reset()
     })
 
     on(nytoppknapp, 'click', function (event) {
@@ -779,6 +757,7 @@ require([
     var vmToppReg = new Vue({
       el: '#fjelltopFormWrapper',
       data: {
+        fjellId: null,
         lagretGrafikk: false,
         fjellSkjema: {
           navn: {
@@ -794,6 +773,34 @@ require([
         }
       },
       methods: {
+        registrerTopp: function () {
+          if (this.lagretGrafikk) {
+            var grafikk = this.lagretGrafikk
+            var attributter = {
+              'navn': this.fjellSkjema.navn.verdi,
+              'hoyde': this.fjellSkjema.hoyde.verdi,
+              'beskrivelse': this.fjellSkjema.beskrivelse,
+              'merknad': this.fjellSkjema.merknad
+            }
+            grafikk.attributes = attributter
+            var edits = {
+              addFeatures: [grafikk]
+            }
+            console.log(grafikk);
+            topp.applyEdits(edits)
+            .then(function(response){
+              if (response.addFeatureResults["0"].objectId) {
+                this.fjellId = response.addFeatureResults["0"].objectId
+                vmValgResultatFjell.velgtopp();
+              } else {
+                console.log('!!Finner ikke fjellID, se logg!!', response);
+              }
+            })
+            .otherwise(function (error) {
+              console.log(error)
+            })
+          }
+        },
         resetkart: function () {
           resetKart(view);
           this.tomSkjema();
@@ -851,7 +858,6 @@ require([
           skiftRegnivaa(regState)
           // topp.visible = false;
           // parkering.visible = true;
-
         },
         registrerTopp: function(event) {
           resetKart(view, event.mapPoint);
@@ -872,17 +878,57 @@ require([
     var vmParkeringInfo = new Vue({
       el: '#parkeringInfoWrapper',
       data: {
-        lagretGrafikk: false,
+        lagretGrafikk: null,
         parkeringsId: null,
+        parkeringSkjema: {
+          navn: null,
+          antallplasser: null,
+          broytet: null,
+          merknad: null
+        },
         valgtparkering: {
           navn: null,
-          plasser: null ,
+          plasser: null,
           broytet: null,
           merknad: null,
           friluftstype: null
         }
       },
       methods: {
+        registrerParkering: function () {
+          console.log(this.lagretGrafikk);
+          if (this.lagretGrafikk) {
+            var grafikk = this.lagretGrafikk
+            var attributter = {
+              antallplasser: this.parkeringSkjema.antallplasser,
+              broytet: this.parkeringSkjema.broytet,
+              merknad: this.parkeringSkjema.merknad,
+              navn: this.parkeringSkjema.navn
+            }
+            grafikk.attributes = attributter
+            var edits = {
+              addFeatures: [grafikk]
+            }
+            console.log(grafikk);
+            parkering.applyEdits(edits)
+            .then(function (response) {
+              if (response.addFeatureResults["0"].objectId) {
+                this.parkeringsId = response.addFeatureResults["0"].objectId
+                vmParkeringInfo.velgparkering();
+                topp.definitionExpression = vmToppReg.fjellId;
+                parkering.definitionExpression = vmParkeringInfo.parkeringID;
+                topp.visible = true
+                parkering.visible = true
+                console.log(vmParkeringInfo.parkeringID);
+              } else {
+                console.log('!!Finner ikke parkeringID, se logg!!', response);
+              }
+            })
+            .otherwise(function (error) {
+              console.log(error)
+            })
+          }
+        },
         velgparkering: function () {
           regState = 'rute'
           resetKart(view)
@@ -898,12 +944,6 @@ require([
           }).then(function(){
             view.focus()
           })
-        },
-        registrerParkering: function(event) {
-          resetKart(view, event.mapPoint);
-          currentLayer.opacity = 1;
-          currentLayer.definitionExpression = ''
-          //  Aååly edits. Send inn innlagt pkt og lagre response-objectid i parkeringsid
         },
         resetValgtParkering: function () {
           this.resetkart();
@@ -924,8 +964,8 @@ require([
           uiComponents.classList.remove('borte');
           view.container.classList.remove('halv-aapen');
           currentLayer.definitionExpression = null;
-          view.layerViews.items.map(function(obj){
-            obj.layer.opacity = 1
+          view.map.layers.items.map(function(obj){
+            obj.opacity = 1
           })
           currentLayer.visible = true
           view.cursor = 'pointer'
@@ -957,8 +997,8 @@ require([
           uiComponents.classList.remove('borte');
           view.container.classList.remove('halv-aapen');
           currentLayer.definitionExpression = null;
-          view.layerViews.items.map(function(obj){
-            obj.layer.opacity = 1
+          view.map.layers.items.map(function(obj){
+            obj.opacity = 1
           })
           currentLayer.visible = true
           view.cursor = 'pointer'

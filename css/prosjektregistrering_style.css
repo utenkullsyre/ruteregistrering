@@ -89,9 +89,9 @@ top: 4px;
 
 .kart-img{
   position: relative;
-  height: 27px;
+  height: 20px;
   top: 2px;
-  left: -4px;
+  left: -2px;
 }
 
 #parkeringregistrering img {
@@ -246,6 +246,22 @@ button.accordion.active {
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
+}
+
+#freehandButton {
+    position: absolute;
+    bottom: 35px;
+    color: black;
+}
+
+#resetBtn {
+    position: absolute;
+    bottom: 70px;
+    color: black;
+}
+
+.esri-ui-bottom-right .esri-component {
+    margin-left: 0px;
 }
 
 div.panel {
@@ -579,8 +595,9 @@ textarea {
 }
 
 .aktiv {
-  background: #0079c1;
-  color: #e4e4e4;
+  background: #60b2e3;
+      color: #e4e4e4;
+      border: 2px solid skyblue;
 }
 
 .aktiv svg{

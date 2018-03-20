@@ -65,8 +65,18 @@
             <!-- <input type="text"  name="search" placeholder="Søk på stedsnavn"> -->
           </div>
           <button class="action-button " id="nyTopp" data-regtype="fjell" type="button"><img src="img\mountain_smll.png" class="kart-img" alt=""></button>
-          <button class="action-button borte kart-img" id="nyParkering" data-regtype="parkering" type="button"><img src="img\parkering.png" class="kart-img" alt=""></button>
-          <button class="action-button borte kart-img" id="nyRute" data-regtype="rute" type="button"><img src="img\trail.png" class="kart-img" alt=""></button>
+          <button class="action-button borte" id="nyParkering" data-regtype="parkering" type="button"><img src="img\parkering.png" class="kart-img" alt=""></button>
+          <button class="action-button borte" id="nyRute" data-regtype="rute" type="button"><img src="img\trail.png" class="kart-img" alt=""></button>
+          <button class="action-button borte hide" id="freehandButton" type="button"
+            title="Freehand">
+            <svg xmlns="http://www.w3.org/2000/svg" width="0.173276in" height="0.194084in" viewbox="0 0 12.4758 13.9741" xml:space="preserve">
+              <!-- <style type="text/css">
+                .st1 {stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75;fill:none}
+              </style><title>Side-1</title> -->
+              <g transform="translate(11.6257,-3.96228) rotate(56.2997)"><title>Ark.2</title><path d="M0 10.8C0.07 10.95 0.1 11.14 0.13 11.31 0.28 12.08 0.55 12.35 0.96 12.92 1.24 13.33 1.59 13.88 2.01 13.96 2.32 14.02 2.66 13.84 2.83 13.6 3.15 13.16 2.88 12.51 2.62 11.85 2.47 11.46 2.33 11.07 2.41 10.77 2.51 10.38 2.98 10.15 3.36 10.24 3.99 10.38 4.33 11.4 4.87 12.08 5.7 13.13 7.01 13.38 8.06 12.71 8.68 12.31 9.21 11.58 9.53 10.88 9.88 10.1 9.96 9.36 9.67 8.6 9.49 8.12 9.15 7.62 8.71 7.36 8.26 7.09 7.71 7.06 7.32 7.31 6.66 7.74 6.47 8.98 6.84 9.79 7.68 11.61 11.41 11.19 12.24 10.8" class="st1"/></g></svg>
+          </button>
+          <button class="action-button esri-icon-rotate-back borte hide" id="undoButton" type="button" title="Undo"></button>
+          <button class="action-button esri-icon-trash borte hide" id="resetBtn" type="button" title="Clear graphics"></button>
         </div>
         <div id="fjelltopFormWrapper">
           <div  class="form-wrapper" v-if="lagretGrafikk">
@@ -80,25 +90,25 @@
               <div class="formitem">
                 <label for="topphoyde">Høyde *</label>
                 <div id="dato">
-                  <input type="number" min="0" max="2700" name="topphoyde" placeholder="moh" required v-model="fjellSkjema.hoyde.verdi">
+                  <input type="number" min="0" max="2700" name="topphoyde" placeholder="moh" required v-model="fjellSkjema.hoyde.verdi"><span> moh.</span>
                 </div>
               </div>
 
               <div class="formitem">
                 <label for="beskrivelse">Beskrivelse *</label>
-                <textarea  name="beskrivelse" placeholder="Skriv inn en beskrivelse av turen" rows="8" cols="80"></textarea>
+                <textarea  name="beskrivelse" placeholder="Skriv inn en beskrivelse av turen" rows="8" cols="80" v-model="fjellSkjema.beskrivelse"></textarea>
               </div>
 
               <div class="formitem">
                 <label for="merknad">Merknad</label>
-                <textarea  name="merknad" placeholder="Skriv inn en merknad av turen om det finnes noen" rows="4" cols="80"></textarea>
+                <textarea  name="merknad" placeholder="Skriv inn en merknad av turen om det finnes noen" rows="4" cols="80" v-model="fjellSkjema.merknad"></textarea>
               </div>
 
               <div id="valideringForm" class="message">
               </div>
             </form>
             <div class="knapperad">
-              <button type="button" class="knapp" name="registrerFjelltopp">Registrer fjelltopp</button>
+              <button type="button" class="knapp" name="registrerFjelltopp" @click="registrerTopp">Registrer fjelltopp</button>
               <button type="button" class="knapp" name="" @click="resetkart">Prøv igjen</button>
             </div>
           </div>
@@ -136,7 +146,7 @@
 
               <div class="formitem">
                 <label for="">Antall parkeringsplasser *</label>
-                <select name="vegavdeling" required>
+                <select name="vegavdeling" required v-model="parkeringSkjema.antallplasser">
                   <option value="" disabled selected>Velg antall parkeringsplasser</option>
                   <option value="0 - 5">0 - 5</option>
                   <option value="5 - 10">5 - 10</option>
@@ -147,7 +157,7 @@
 
               <div class="formitem">
                 <label for="">Vinterbrøytet *</label>
-                <select name="vegavdeling" required>
+                <select name="vegavdeling" required v-model="parkeringSkjema.broytet">
                   <option value="" disabled selected>Velg alternativ</option>
                   <option value="ja">Ja</option>
                   <option value="nei">Nei</option>
@@ -156,11 +166,11 @@
 
               <div class="formitem">
                 <label for="merknad">Merknad</label>
-                <textarea  name="merknad" placeholder="Skriv inn en merknad om parkeringen om det finnes noen" rows="8" cols="80"></textarea>
+                <textarea  name="merknad" placeholder="Skriv inn en merknad om parkeringen om det finnes noen" rows="8" cols="80" v-model="parkeringSkjema.merknad"></textarea>
               </div>
             </form>
             <div class="knapperad">
-              <button type="button" class="knapp" name="registrerParkering">Registrer parkering</button>
+              <button type="button" class="knapp" name="registrerParkering" @click="registrerParkering">Registrer parkering</button>
               <button type="button" class="knapp" name="" @click="resetkart">Prøv igjen</button>
             </div>
           </div>
@@ -184,7 +194,7 @@
 
       <!-- Registrer rute -->
       <button id="ruteregistrering" class="accordion" data-regtype="rute">Rute <img class="title-img" src="img\trail.png" alt=""></button>
-      <div id="ruteinfo" class="panel aapen" data-regtype="rute">
+      <div id="ruteinfo" class="panel" data-regtype="rute">
           <p>I denne seksjonen kan du registrere en ny rute/spor (<img class="title-img inline-img" src="img\trail.png" alt="">).</p>
           <!-- Skjema for registrering parkeringsinfo -->
           <div id="ruteInfoWrapper">
