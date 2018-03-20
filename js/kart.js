@@ -502,41 +502,38 @@ require([
           viewDivTest.classList.add('halv-aapen')
           //  Hvis friluftstype er lik fjell, oppdater vue info for fjell-info
           if (resultat.friluftstype === 'topp') {
-            vmValgResultat.valgttopp.navn = resultat.navn.length > 0 ? resultat.navn : "Ikke registrert navn",
-            vmValgResultat.valgttopp.hoyde = resultat.hoyde,
-            vmValgResultat.valgttopp.beskrivelse = resultat.beskrivelse.length > 0 ? resultat.beskrivelse : "Ikke registrert beskrivelse",
-            vmValgResultat.valgttopp.merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merknad"
+            vmValgResultatFjell.valgttopp.navn = resultat.navn.length > 0 ? resultat.navn : "Ikke registrert navn",
+            vmValgResultatFjell.valgttopp.hoyde = resultat.hoyde,
+            vmValgResultatFjell.valgttopp.beskrivelse = resultat.beskrivelse.length > 0 ? resultat.beskrivelse : "Ikke registrert beskrivelse",
+            vmValgResultatFjell.valgttopp.merknad = resultat.merknad.length > 0 ? resultat.merknad : "Ingen registrert merknad"
             topp.definitionExpression = 'OBJECTID = ' + resultat.OBJECTID
             valgtToppInfo.classList.remove('borte')
-
-          }
           //  Hvis friluftstype er lik parkering oppdater vue infor for parkering-info
           } else if (resultat.friluftstype === 'parkering') {
 
+          }
           //  Hvis ingen av de ovenfor matcher, gjør dette
-          } else {
-
-
-        } else if (response.results.length === 0 && stateHandler === 'nyTopp') {
-          console.log('Statehandler = ' + stateHandler);
-          grafikkLag.removeAll();
-          var grafikk = leggTilPkt(event.mapPoint)
-          vmToppReg.lagretGrafikk = true;
-          grafikkLag.graphics.add(grafikk)
-          view.goTo({
-            target: grafikk
-          })
-          .then(function(response){
-            viewDivTest.classList.add('halv-aapen')
-            toggleUi(view, 'off')
-            formFjellWrapper.classList.remove('borte')
-            formFjellWrapper.classList.add('aapen')
-            topp.opacity = 1
-            topp.visible = false
-            console.log(view);
-
-
-          })
+          else {
+            }
+          }
+        else if (response.results.length === 0 && stateHandler === 'nyTopp') {
+        console.log('Statehandler = ' + stateHandler);
+        grafikkLag.removeAll();
+        var grafikk = leggTilPkt(event.mapPoint)
+        vmToppReg.lagretGrafikk = true;
+        grafikkLag.graphics.add(grafikk)
+        view.goTo({
+          target: grafikk
+        })
+        .then(function(response){
+          viewDivTest.classList.add('halv-aapen')
+          toggleUi(view, 'off')
+          formFjellWrapper.classList.remove('borte')
+          formFjellWrapper.classList.add('aapen')
+          topp.opacity = 1
+          topp.visible = false
+          console.log(view);
+        })
         } else if (response.results.length === 0 && stateHandler === 'nyParkering') {
           console.log('Statehandler = ' + stateHandler);
           grafikkLag.removeAll();
@@ -554,10 +551,9 @@ require([
             topp.opacity = 1
             topp.visible = false
             console.log(view);
-
-
           })
-        } else if (response.results.length === 0 && stateHandler === 'nyRute') {
+        }
+        else if (response.results.length === 0 && stateHandler === 'nyRute') {
           console.log('Statehandler = ' + stateHandler);
           grafikkLag.removeAll();
           // Legg til linjegrafikk
@@ -574,8 +570,6 @@ require([
             topp.opacity = 1
             topp.visible = false
             console.log(view);
-
-
           })
         } else {
           // view.container.classList.add('borte')
@@ -740,7 +734,7 @@ require([
       }
     })
 
-    var vmValgResultat = new Vue({
+    var vmValgResultatFjell = new Vue({
       el: '#valgtFjelltopp',
       data: {
         valgttopp: {
@@ -787,6 +781,42 @@ require([
         },
         resetValgtTopp: function(){
           this.valgttopp = {
+            navn: '',
+            hoyde: null ,
+            beskrivelse: '',
+            merknad: 'Ingen registrerte merknader'
+          }
+        }
+      }
+    })
+
+    var vmValgResultatParkering = new Vue({
+      el: '#valgtParkering',
+      data: {
+        valgtparkering: {
+          navn: '',
+          plasser: null ,
+          broytet: '',
+          merknad: 'Ingen registrerte merknader'
+        }
+      },
+      methods: {
+        velgnytopp: function () {
+          this.resetValgtTopp();
+          resetKart(view);
+          view.goTo({
+            target: event.mapPoint
+          }).then(function(){
+            view.focus()
+          })
+        },
+        registrerTopp: function(event) {
+          resetKart(view, event.mapPoint);
+          parkering.opacity = 1;
+          parkering.definitionExpression = ''
+        },
+        resetValgtTopp: function(){
+          this.valgtparkering = {
             navn: '',
             hoyde: null ,
             beskrivelse: '',
