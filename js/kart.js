@@ -917,12 +917,12 @@ require([
               if (response.addFeatureResults["0"].objectId) {
                 this.parkeringsId = response.addFeatureResults["0"].objectId
                 vmParkeringInfo.velgparkering();
-                // topp.definitionExpression = vmToppReg.fjellId;
-                // parkering.definitionExpression = vmParkeringInfo.parkeringID;
+                topp.definitionExpression = vmToppReg.fjellId;
+                parkering.definitionExpression = vmParkeringInfo.parkeringID;
                 console.log(topp, parkering);
                 // topp.visible = true
                 // parkering.visible = true
-                console.log(vmParkeringInfo.parkeringID);
+                console.log(vmParkeringInfo.parkeringID, vmToppReg.fjellId);
               } else {
                 console.log('!!Finner ikke parkeringID, se logg!!', response);
               }
